@@ -1,39 +1,37 @@
 import LinkArrow from "@/components/primitives/LinkArrow";
 import DataTable from "@/components/primitives/DataTable";
+import { localeHref } from "@/content";
 
 /**
  * The trade lane table. Shared by the home page and /network so the two can
  * never show different frequencies.
+ *
+ * The columns are built per render rather than declared once at module scope,
+ * because their labels are now words in the reader's language.
  */
-const columns = [
-  {
-    key: "lane",
-    label: "Trade lane",
-    render: (row) => <span className="lane-flag">{row.lane}</span>,
-  },
-  { key: "frequency", label: "Frequency" },
-  { key: "transit", label: "Transit", numeric: true },
-  { key: "cargo", label: "Cargo" },
-  {
-    key: "action",
-    label: "Lane details",
-    hideLabel: true,
-    numeric: true,
-    action: true,
-    render: (row) => (
-      <LinkArrow href="/network" aria-label={`Lane details: ${row.lane}`}>
-        <span className="table__action-text">Lane details</span>
-      </LinkArrow>
-    ),
-  },
-];
+export default function LaneTable({ lanes, locale, ui }) {
+  const columns = [
+    {
+      key: "lane",
+      label: ui.table.tradeLane,
+      render: (row) => <span className="lane-flag">{row.lane}</span>,
+    },
+    { key: "frequency", label: ui.table.frequency },
+    { key: "transit", label: ui.table.transit, numeric: true },
+    { key: "cargo", label: ui.table.cargo },
+    {
+      key: "action",
+      label: ui.a11y.laneDetails,
+      hideLabel: true,
+      numeric: true,
+      action: true,
+      render: (row) => (
+        <LinkArrow href={localeHref(locale, "/network")} aria-label={`${ui.a11y.laneDetails}: ${row.lane}`}>
+          <span className="table__action-text">{ui.a11y.laneDetails}</span>
+        </LinkArrow>
+      ),
+    },
+  ];
 
-export default function LaneTable({ lanes }) {
-  return (
-    <DataTable
-      caption="Caspian Sea Line trade lanes, frequency, transit time and cargo types"
-      columns={columns}
-      rows={lanes}
-    />
-  );
+  return <DataTable caption={ui.a11y.laneTableCaption} columns={columns} rows={lanes} />;
 }

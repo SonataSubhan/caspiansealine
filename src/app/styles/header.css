@@ -380,3 +380,58 @@
 }
 
 body[data-scroll-locked="true"] { overflow: hidden; }
+
+/* --------------------------------------------------------------------------
+   Language switcher
+
+   It used to be a bare <span> holding a globe and the text "EN", and it sat in
+   a list whose flex layout was declared on `.header-utility a` — which the
+   span was not. So the icon and the label stacked instead of sitting on one
+   line. This is the fix and the real control at once.
+   -------------------------------------------------------------------------- */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3xs);
+}
+
+.lang-switch__list {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* A hairline between the two codes, drawn once between them rather than as a
+   border on each — the same rule the rest of the site uses for dividers. */
+.lang-switch__list > li + li::before {
+  content: "";
+  display: inline-block;
+  inline-size: 1px;
+  block-size: 0.75em;
+  margin-inline: var(--space-3xs);
+  vertical-align: -0.05em;
+  background-color: var(--border-inverse-s);
+}
+
+.lang-switch__item {
+  display: inline-flex;
+  align-items: center;
+  padding-block: var(--space-3xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-wide);
+  color: var(--text-inverse-mute);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.lang-switch__item[aria-current="true"] {
+  color: var(--neutral-000);
+}
+
+a.lang-switch__item:hover,
+a.lang-switch__item:focus-visible {
+  color: var(--brand-cyan);
+}

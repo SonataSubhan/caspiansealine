@@ -9,11 +9,11 @@ import Breadcrumb from "@/components/navigation/Breadcrumb";
  * The h1 lives here, which keeps the heading hierarchy identical on every
  * page: one h1 in the hero, h2 for each section below it.
  */
-export default function PageHero({ eyebrow, eyebrowTone, title, lead, breadcrumb, children }) {
+export default function PageHero({ eyebrow, eyebrowTone, title, lead, breadcrumb, locale, children }) {
   return (
     <section className="b-pagehero motif" data-surface="inverse" aria-labelledby="page-title">
       <Container className="b-pagehero__inner">
-        {breadcrumb ? <Breadcrumb items={breadcrumb} /> : null}
+        {breadcrumb ? <Breadcrumb items={breadcrumb} locale={locale} /> : null}
         {eyebrow ? <Eyebrow tone={eyebrowTone}>{eyebrow}</Eyebrow> : null}
         <h1 className="t-h1 b-pagehero__title" id="page-title">
           {title}

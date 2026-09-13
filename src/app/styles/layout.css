@@ -128,8 +128,15 @@
 .rule-grid--4 { --cols: 4; }
 .rule-grid--boxed { border: var(--border-w) solid var(--border-subtle); }
 
-@media (max-width: 1023px) {
+/* Four hairline cells need about 270px each before the text inside starts
+   breaking mid-phrase. That is comfortable in English at 1024px and cramped in
+   Azerbaijani, where the same labels run 10–20% longer — so the four-column
+   grid drops to two at 1100px rather than 1024px, for both languages. */
+@media (max-width: 1099px) {
   .rule-grid--4 { --cols: 2; }
+}
+
+@media (max-width: 1023px) {
   .rule-grid--3 { --cols: 1; }
 }
 

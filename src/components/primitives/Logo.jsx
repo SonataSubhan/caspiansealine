@@ -17,11 +17,11 @@ const SOURCES = {
   colour: "/brand/logo-color.svg",
 };
 
-export default function Logo({ variant = "navy", height, href = "/", className = "" }) {
+export default function Logo({ variant = "navy", height, href = "/", label = "Caspian Sea Line", className = "" }) {
   const style = height ? { "--logo-h": height } : undefined;
 
   return (
-    <Link className={`logo ${className}`.trim()} href={href} style={style} aria-label={`Caspian Sea Line — home`}>
+    <Link className={`logo ${className}`.trim()} href={href} style={style} aria-label={label}>
       <Image
         className="logo__mark"
         src={SOURCES[variant]}

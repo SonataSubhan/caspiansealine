@@ -66,6 +66,36 @@ const nextConfig = {
     ],
   },
 
+  /**
+   * English is served without a language prefix (see proxy.js), so the
+   * prefixed spelling must not also resolve — two URLs for one page split its
+   * ranking signals and give the crawler a duplicate to reconcile.
+   *
+   * A redirect in this file runs before the proxy, so `/en/services` is sent
+   * to `/services` and only then rewritten back internally. Azerbaijani keeps
+   * its prefix and is untouched.
+   */
+  async redirects() {
+    return [
+      { source: "/en", destination: "/", permanent: true },
+      /**
+       * Everything under /en goes to the unprefixed URL — except the generated
+       * share cards.
+       *
+       * Next builds `og:image` from the route path, which for English is
+       * `/en/…/opengraph-image`. Sending that through a redirect would make
+       * every link preview a two-hop fetch, and some scrapers (WhatsApp in
+       * particular) do not follow a redirect for an image. The card is not a
+       * page a person lands on, so serving it at its real path costs nothing.
+       */
+      {
+        source: "/en/:path((?!.*opengraph-image).*)",
+        destination: "/:path",
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     return [
       {

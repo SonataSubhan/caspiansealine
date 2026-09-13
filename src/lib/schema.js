@@ -1,4 +1,4 @@
-import { site } from "@/content/en/site";
+import { defaultLocale, getContent, localeHref, localeNames, locales } from "@/content";
 import { absoluteUrl } from "./seo";
 
 /**
@@ -7,12 +7,20 @@ import { absoluteUrl } from "./seo";
  * Every graph node gets a stable @id so pages can reference the organisation
  * rather than redeclaring it — which is what lets Google treat the whole site
  * as one entity instead of forty unrelated ones.
+ *
+ * The company is ONE entity in both languages, so `@id` deliberately carries
+ * no locale: the Azerbaijani pages point at the same organisation node the
+ * English ones do. Only the page-level nodes are per-language, and they say so
+ * with `inLanguage`.
  */
+const { site: defaultSite } = getContent(defaultLocale);
 
-export const ORGANISATION_ID = `${site.url}/#organization`;
-export const WEBSITE_ID = `${site.url}/#website`;
+export const ORGANISATION_ID = `${defaultSite.url}/#organization`;
+export const WEBSITE_ID = `${defaultSite.url}/#website`;
 
-export function organisationSchema() {
+export function organisationSchema(locale = defaultLocale) {
+  const { site } = getContent(locale);
+
   return {
     "@type": "Organization",
     "@id": ORGANISATION_ID,
@@ -40,53 +48,66 @@ export function organisationSchema() {
         contactType: "customer service",
         telephone: site.contact.phone,
         email: site.contact.operationsEmail,
-        availableLanguage: site.plannedLocales,
+        availableLanguage: locales.map((code) => localeNames[code].name),
       },
     ],
     sameAs: site.social.filter((item) => item.href !== "#").map((item) => item.href),
   };
 }
 
-export function websiteSchema() {
+export function websiteSchema(locale = defaultLocale) {
+  const { site } = getContent(locale);
+
   return {
     "@type": "WebSite",
     "@id": WEBSITE_ID,
     url: absoluteUrl("/"),
     name: site.name,
     publisher: { "@id": ORGANISATION_ID },
-    inLanguage: site.locale,
+    inLanguage: locales,
   };
 }
 
-export function webPageSchema({ path, name, description }) {
+export function webPageSchema({ locale = defaultLocale, path, name, description }) {
+  const url = absoluteUrl(localeHref(locale, path));
+
   return {
     "@type": "WebPage",
-    "@id": `${absoluteUrl(path)}#webpage`,
-    url: absoluteUrl(path),
+    "@id": `${url}#webpage`,
+    url,
     name,
     description,
     isPartOf: { "@id": WEBSITE_ID },
     about: { "@id": ORGANISATION_ID },
-    inLanguage: site.locale,
+    inLanguage: localeNames[locale]?.hreflang ?? defaultLocale,
   };
 }
 
-export function breadcrumbSchema(items) {
+export function breadcrumbSchema(items, locale = defaultLocale) {
+  const { ui } = getContent(locale);
+  const trail = [{ name: ui.common.home, href: "/" }, ...items];
+
   return {
     "@type": "BreadcrumbList",
-    itemListElement: [{ name: "Home", href: "/" }, ...items].map((item, index) => ({
+    itemListElement: trail.map((item, index) => ({
       "@type": "ListItem",
       position: index + 1,
       name: item.label || item.name,
-      item: item.href ? absoluteUrl(item.href) : undefined,
+      /* Breadcrumb hrefs from the content layer are already localised; the
+         home entry above is not, so it is localised here. */
+      item: item.href
+        ? absoluteUrl(index === 0 ? localeHref(locale, item.href) : item.href)
+        : undefined,
     })),
   };
 }
 
-export function serviceSchema(service) {
+export function serviceSchema(service, locale = defaultLocale) {
+  const url = absoluteUrl(localeHref(locale, `/services/${service.slug}`));
+
   return {
     "@type": "Service",
-    "@id": `${absoluteUrl(`/services/${service.slug}`)}#service`,
+    "@id": `${url}#service`,
     name: service.title,
     description: service.summary,
     serviceType: service.category,
@@ -95,22 +116,24 @@ export function serviceSchema(service) {
       "@type": "Place",
       name: "Caspian Sea",
     },
-    url: absoluteUrl(`/services/${service.slug}`),
+    url,
   };
 }
 
-export function newsArticleSchema(article) {
+export function newsArticleSchema(article, locale = defaultLocale) {
+  const url = absoluteUrl(localeHref(locale, `/news/${article.slug}`));
+
   return {
     "@type": "NewsArticle",
-    "@id": `${absoluteUrl(`/news/${article.slug}`)}#article`,
+    "@id": `${url}#article`,
     headline: article.title,
     description: article.summary,
     datePublished: article.date,
     dateModified: article.updated || article.date,
     author: { "@id": ORGANISATION_ID },
     publisher: { "@id": ORGANISATION_ID },
-    mainEntityOfPage: absoluteUrl(`/news/${article.slug}`),
-    inLanguage: site.locale,
+    mainEntityOfPage: url,
+    inLanguage: localeNames[locale]?.hreflang ?? defaultLocale,
   };
 }
 

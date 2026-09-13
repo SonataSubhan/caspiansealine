@@ -6,7 +6,7 @@ import Link from "next/link";
 import Icon from "@/components/primitives/Icon";
 import Logo from "@/components/primitives/Logo";
 import Button from "@/components/primitives/Button";
-import { primaryNav, utilityNav } from "@/content/en/navigation";
+import { localeHref } from "@/content";
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
@@ -24,7 +24,8 @@ const CLOSE_ANIMATION_MS = 420;
  * scroll-locked, and `inert` keeps the closed drawer out of the tab order
  * while it is still translated off-screen.
  */
-export default function MobileDrawer({ open, onClose }) {
+export default function MobileDrawer({ open, onClose, locale, content }) {
+  const { primaryNav, utilityNav, ui } = content;
   const drawerRef = useRef(null);
   const previouslyFocused = useRef(null);
   const [openSection, setOpenSection] = useState(null);
@@ -113,11 +114,11 @@ export default function MobileDrawer({ open, onClose }) {
         inert={!open}
         role="dialog"
         aria-modal="true"
-        aria-label="Site menu"
+        aria-label={ui.a11y.siteMenu}
       >
         <div className="drawer__head">
-          <Logo variant="navy" height="1.875rem" />
-          <button className="icon-btn" type="button" aria-label="Close menu" onClick={onClose}>
+          <Logo variant="navy" height="1.875rem" href={localeHref(locale, "/")} label={ui.a11y.homeLink} />
+          <button className="icon-btn" type="button" aria-label={ui.a11y.closeMenu} onClick={onClose}>
             <Icon name="close" />
           </button>
         </div>
@@ -171,7 +172,7 @@ export default function MobileDrawer({ open, onClose }) {
             })}
 
             <div className="acc__item">
-              <p className="acc__group-title">Quick links</p>
+              <p className="acc__group-title">{ui.sections.quickLinks}</p>
               <ul className="acc__list" role="list">
                 {utilityNav.map((item) => (
                   <li key={item.href}>
@@ -184,11 +185,11 @@ export default function MobileDrawer({ open, onClose }) {
         </div>
 
         <div className="drawer__foot">
-          <Button href="/quote" block arrow>
-            Get a quote
+          <Button href={localeHref(locale, "/quote")} block arrow>
+            {ui.common.getQuote}
           </Button>
-          <Button href="/contact" variant="secondary" block>
-            Contact us
+          <Button href={localeHref(locale, "/contact")} variant="secondary" block>
+            {ui.a11y.contactUs}
           </Button>
         </div>
       </div>

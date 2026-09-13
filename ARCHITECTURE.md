@@ -34,8 +34,10 @@ a site grows past a dozen pages.
 ```
 src/
 ├── app/                     Routes only — thin files that compose blocks
-│   ├── layout.js            Root metadata, fonts, sprite, header, footer, Organization JSON-LD
-│   ├── page.js              Home
+│   ├── [locale]/            EVERY page route — en and az (see §5)
+│   │   ├── layout.js        Root layout: <html lang>, fonts, header, footer, JSON-LD
+│   │   ├── page.js          Home
+│   │   └── …                services · network · fleet · about · news · legal · …
 │   ├── globals.css          The CSS entry point (import order = cascade contract)
 │   ├── fonts.js             next/font/local — Mulish, called exactly once
 │   ├── fonts/*.woff2        Self-hosted variable font (latin + latin-ext)
@@ -45,33 +47,27 @@ src/
 │   ├── icon.svg             Favicon (SVG)
 │   ├── favicon.ico          Favicon (legacy, multi-size)
 │   ├── apple-icon.png       180×180
-│   ├── opengraph-image.js   The default share card (one per segment below, too)
-│   ├── sitemap.js           Generated from the content layer
-│   ├── robots.js
-│   ├── not-found.js
-│   ├── services/            + [slug]  → 16 pages from one template
-│   ├── network/             + /schedule, /agents, /ports/[slug]
-│   ├── fleet/  about/  about/leadership/  sustainability/  hsseq/
-│   ├── certifications/  careers/  news/ + [slug]
-│   ├── quote/  contact/  track/
-│   └── legal/[slug]         → 5 documents from one template
+│   ├── sitemap.js           Both languages, with hreflang alternates
+│   └── robots.js
+│
+├── proxy.js                 Serves English without the /en prefix (see §5)
 │
 ├── components/
 │   ├── primitives/          Button, LinkArrow, Card, Media, Badge, Stat, SpecList,
 │   │                        DataTable, Field, Eyebrow, Icon, IconSprite, Logo
 │   ├── layout/              Container, Section, SectionHead, Grid, RuleGrid, Split,
 │   │                        Stack, Cluster, Prose
-│   ├── navigation/          SiteHeader, MobileDrawer, SiteFooter, Breadcrumb, SkipLink
+│   ├── navigation/          SiteHeader, MobileDrawer, SiteFooter, Breadcrumb, SkipLink,
+│   │                        LanguageSwitcher
 │   ├── motion/              RevealController, PageTransition, motionBootScript
 │   └── blocks/              Page sections: Hero, QuickBar, Intro, ServicePillars,
 │                            NetworkPreview, LaneTable, FleetGrid, Capabilities,
 │                            SustainabilityBand, NewsGrid, CtaBand, PageHero, EnquiryForm
 │
-├── content/en/              THE ONLY PLACE COPY LIVES
-│   ├── site.js              Company facts, contact details, socials
-│   ├── navigation.js        The site structure — header, drawer, footer and sitemap
-│   ├── home.js  services.js  network.js  fleet.js  company.js
-│   ├── sustainability.js  news.js  forms.js  legal.js
+├── content/                 THE ONLY PLACE COPY LIVES — see §5
+│   ├── index.js  lookup.js  site-shared.js  media-sources.js
+│   ├── en/                  site · navigation · ui · home · services · network ·
+│   └── az/                  fleet · company · sustainability · news · forms · legal · media
 │
 └── lib/
     ├── seo.js               buildMetadata() — one metadata builder for every page
@@ -92,16 +88,17 @@ src/
 
 | You want to… | Edit |
 |---|---|
-| Reword any heading or paragraph | the matching file in `src/content/en/` |
-| Add a service | one entry in `services.js` + one link in `navigation.js` — no new page file |
+| Reword any heading or paragraph | the matching file in `src/content/en/` **and** `src/content/az/` |
+| Add a service | one entry in each language's `services.js` + one link in each `navigation.js` |
 | Add a port | one entry in `network.js` — the page, the sitemap and the nav follow |
 | Publish a news article | one entry in `news.js` |
 | Change the brand colour, type scale, spacing or radius | `src/app/styles/tokens.css` |
 | Make the animations faster, slower, longer or shorter | the `--motion-*` tokens in `src/app/styles/tokens.css` |
 | Turn all motion off | delete the three files listed in §8 |
 | Make the whole site denser or airier | `--section-y` in `src/app/styles/tokens.css` |
-| Add a nav item | `content/en/navigation.js` — header, drawer and footer all update |
-| Change the site-wide title pattern | `title.template` in `app/layout.js` |
+| Add a nav item | `navigation.js` in both languages — header, drawer and footer all update |
+| Change the site-wide title pattern | `title.template` in `app/[locale]/layout.js` |
+| Add a third language | a `content/<code>/` folder with the same exports + one entry in `content/index.js` |
 | Wire the forms up | `NEXT_PUBLIC_FORM_ENDPOINT` — `lib/forms.js` needs no change |
 | Drop in real photography | replace `<Media slot=… />` with `<Media src=… alt=… />` |
 
@@ -126,17 +123,62 @@ request-time dependency and it must be fixed rather than accepted.
 
 ---
 
-## 5. Internationalisation
+## 5. Two languages
 
-The site ships English only, but nothing has to be refactored to add Azerbaijani or
-Russian:
+The site ships in **English and Azerbaijani**. English has no URL prefix, Azerbaijani
+lives under `/az` — `/services` and `/az/services` are the same page in two languages.
+English keeps the URLs it already had, so nothing already indexed or already shared
+changed address.
 
-- All copy already sits in `content/en/`, keyed by page. Adding a locale means adding
-  `content/az/` and moving the routes under `app/[locale]/`.
-- The layout uses CSS logical properties throughout (`inline-size`, `padding-block`,
-  `inset-inline`), so a different text direction needs no layout changes.
-- The font already loads latin-ext, which carries the Azerbaijani diacritics.
-- `site.plannedLocales` and the `hreflang` slot in `lib/seo.js` are in place.
+```
+src/content/
+├── index.js          locales, getContent(locale), localeHref(), the href prefixer
+├── lookup.js         bySlug / byCategory / newestFirst / formatDate — data has no functions
+├── site-shared.js    phone numbers, mailboxes, the domain — never translated
+├── media-sources.js  which file fills which image slot — never translated
+├── en/               the English dictionary  (index.js re-exports the modules)
+└── az/               the Azerbaijani dictionary, same export names
+```
+
+Five rules hold it together:
+
+**1. Both dictionaries export the same names.** A page asks for `home` and gets the
+reader's `home`; it never learns that two exist. `src/content/en/index.js` and
+`src/content/az/index.js` are the contract — a name in one and not the other fails the
+build at the first page that reads it.
+
+**2. Nothing that isn't language lives in a language folder.** The office number, the
+domain and the photograph paths are in `site-shared.js` and `media-sources.js`, imported
+into both. Two copies of a phone number is one phone number that will eventually be
+wrong.
+
+**3. The language files carry unprefixed hrefs.** `content/index.js` walks the
+Azerbaijani dictionary once and puts `/az` in front of every internal `href`. Writing the
+prefix by hand across a hundred links would mean getting one wrong, and one wrong link
+drops the reader back into English mid-journey.
+
+**4. Slugs are identical in both languages.** That is what lets the switcher land the
+reader on the *same page* rather than the home page, with no lookup table between
+translated URLs and nothing to maintain when a page is added.
+
+**5. Every string a person can perceive is in the content layer.** `content/<locale>/ui.js`
+holds the interface strings — table headers, "Read more", every `aria-label`. A
+single-language site can leave those in JSX and nobody notices; a second language turns
+each one into a visible bug.
+
+| Piece | File |
+|---|---|
+| The URL scheme | `src/proxy.js` — rewrites `/x` to `/en/x`; `next.config.mjs` redirects `/en/x` back to `/x` |
+| The language segment | `src/app/[locale]/` — every route, with `generateStaticParams` for both |
+| The switcher | `src/components/navigation/LanguageSwitcher.jsx` |
+| Dates | `formatDate(iso, locale)` in `content/lookup.js` — `az-Latn-AZ` / `en-GB` |
+| 404 | reads the locale from `next/root-params`, since a not-found page gets no `params` |
+
+The proxy rewrite does **not** make anything dynamic: the build still prerenders every
+route in both languages (155 static outputs).
+
+**Adding Russian** is a folder, a barrel with the same export names, and one entry in
+`locales`. No component and no page changes.
 
 ---
 
@@ -160,7 +202,12 @@ Russian:
 - `sitemap.xml` and `robots.txt` are generated from the content layer, so a new page is in
   the sitemap the moment it exists.
 - One `h1` per page, no skipped heading levels — verified across all routes at six
-  viewport widths.
+  viewport widths, in both languages.
+- `hreflang`: every page declares itself and its translation, plus `x-default` pointing at
+  English, in the `<head>` **and** in the sitemap. Without that pair a bilingual site's two
+  languages compete with each other and one gets suppressed as a duplicate.
+- `<html lang>` is the reader's language; JSON-LD carries `inLanguage`. The organisation
+  node deliberately has one `@id` across both languages — it is one company, not two.
 - Descriptions are trimmed by `trimDescription()`, which cuts at the last full sentence
   that fits and otherwise at a word boundary, dropping a dangling conjunction. A hard
   `.slice(155)` stops mid-word, in the one piece of copy a searcher reads before clicking.
@@ -192,7 +239,18 @@ only, which is why they are already correct and stay correct when real photograp
 > Satori (the renderer behind `ImageResponse`) cannot read woff2 and cannot load `<Image>`,
 > so `src/lib/og-assets/` holds two static Mulish TTF instances (400 and 800) generated
 > from the same variable font the site ships, plus PNG renders of the white logo and
-> symbol. ~130 KB, build-time only, never sent to a browser.
+> symbol. ~190 KB, build-time only, never sent to a browser.
+>
+> Those TTFs merge Mulish's **latin and latin-ext** subsets. The latin subset alone has no
+> `ə`, `ğ` or `ş`, and Satori drops a missing glyph silently — the first Azerbaijani card
+> read "Xidm tl r" instead of "Xidmətlər". If a third language is added, check its
+> alphabet against these two files before trusting the card.
+
+The English card is served at `/en/…/opengraph-image` and is the one path under `/en`
+that `next.config.mjs` does **not** redirect to the unprefixed URL: `og:image` is fetched
+by a scraper, not visited by a person, and some scrapers (WhatsApp) will not follow a
+redirect for an image. `proxy.js` correspondingly leaves any already-prefixed path alone,
+including `/en`, so the card is never prefixed twice.
 
 ---
 

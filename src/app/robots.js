@@ -1,4 +1,6 @@
-import { site } from "@/content/en/site";
+import { getContent, defaultLocale } from "@/content";
+
+const { site } = getContent(defaultLocale);
 
 export default function robots() {
   return {

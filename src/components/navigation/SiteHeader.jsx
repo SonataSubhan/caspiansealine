@@ -12,8 +12,8 @@ import LinkArrow from "@/components/primitives/LinkArrow";
 import Eyebrow from "@/components/primitives/Eyebrow";
 import Container from "@/components/layout/Container";
 import MobileDrawer from "./MobileDrawer";
-import { primaryNav, utilityNav } from "@/content/en/navigation";
-import { site } from "@/content/en/site";
+import LanguageSwitcher from "./LanguageSwitcher";
+import { localeHref } from "@/content";
 
 const HOVER_OPEN_DELAY = 90;
 const HOVER_CLOSE_DELAY = 180;
@@ -31,7 +31,8 @@ const HOVER_CLOSE_DELAY = 180;
  * The panels are hidden with `visibility`, not `display`, so they can animate;
  * `inert` keeps a closed panel out of the tab order regardless.
  */
-export default function SiteHeader() {
+export default function SiteHeader({ locale, content }) {
+  const { primaryNav, utilityNav, site, ui } = content;
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -145,12 +146,7 @@ export default function SiteHeader() {
                 </a>
               </li>
               <li>
-                {/* English only today. The content layer is already keyed by
-                    locale, so AZ and RU drop in without touching this markup. */}
-                <span aria-label="Current language: English">
-                  <Icon name="globe" className="header-utility__icon" />
-                  EN
-                </span>
+                <LanguageSwitcher locale={locale} label={ui.a11y.languageLabel} />
               </li>
             </ul>
           </Container>
@@ -158,9 +154,9 @@ export default function SiteHeader() {
 
         <div className="header-main">
           <Container className="header-main__inner">
-            <Logo variant="navy" />
+            <Logo variant="navy" href={localeHref(locale, "/")} label={ui.a11y.homeLink} />
 
-            <nav className="nav-primary" aria-label="Primary">
+            <nav className="nav-primary" aria-label={ui.a11y.primaryNav}>
               <ul className="nav-primary__list" role="list">
                 {primaryNav.map((item) =>
                   item.groups ? (
@@ -199,16 +195,20 @@ export default function SiteHeader() {
             </nav>
 
             <div className="header-actions">
-              <Link className="icon-btn" href="/contact" aria-label="Contact us">
+              <Link
+                className="icon-btn"
+                href={localeHref(locale, "/contact")}
+                aria-label={ui.a11y.contactUs}
+              >
                 <Icon name="mail" />
               </Link>
-              <Button className="header-cta" href="/quote" arrow>
-                Get a quote
+              <Button className="header-cta" href={localeHref(locale, "/quote")} arrow>
+                {ui.common.getQuote}
               </Button>
               <button
                 className="icon-btn header-burger"
                 type="button"
-                aria-label="Open menu"
+                aria-label={ui.a11y.openMenu}
                 aria-expanded={drawerOpen}
                 aria-controls="site-drawer"
                 onClick={() => setDrawerOpen(true)}
@@ -256,7 +256,7 @@ export default function SiteHeader() {
 
                   {item.feature ? (
                     <div className="megamenu__feature">
-                      <Media
+                      <Media locale={locale}
                         slot={item.feature.image.slot}
                         width={item.feature.image.width}
                         height={item.feature.image.height}
@@ -274,7 +274,12 @@ export default function SiteHeader() {
           })}
       </header>
 
-      <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <MobileDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        locale={locale}
+        content={content}
+      />
     </>
   );
 }

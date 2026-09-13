@@ -6,7 +6,7 @@
  * lawyer before publication — a carrier's terms of carriage are a contract.
  */
 
-const documents = [
+export const legalDocuments = [
   {
     slug: "privacy",
     title: "Privacy notice",
@@ -88,11 +88,3 @@ const documents = [
     ],
   },
 ];
-
-export function getLegalDocuments() {
-  return documents;
-}
-
-export function getLegalDocument(slug) {
-  return documents.find((doc) => doc.slug === slug);
-}

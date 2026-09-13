@@ -76,7 +76,3 @@ export const fleetPage = {
     link: { label: "Chartering & brokerage", href: "/services/chartering" },
   },
 };
-
-export function getVessel(slug) {
-  return vessels.find((vessel) => vessel.slug === slug);
-}

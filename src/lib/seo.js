@@ -1,4 +1,4 @@
-import { site } from "@/content/en/site";
+import { defaultLocale, getContent, localeAlternates, localeHref } from "@/content";
 
 /**
  * One metadata builder for every page.
@@ -10,12 +10,19 @@ import { site } from "@/content/en/site";
  *
  * `metadataBase` lives in the root layout, so every URL below can be relative.
  *
+ * `locale` decides three things at once: which language's fallback description
+ * is used, where the canonical points, and the `hreflang` set that tells a
+ * search engine these two pages are the same page in two languages rather than
+ * two competing pages. Omitting the hreflang pair is the classic way a
+ * bilingual site ends up with each language suppressing the other.
+ *
  * The share IMAGE is deliberately not set here. Next adds the card produced by
  * the route's `opengraph-image.js` automatically — but only while this file
  * leaves `openGraph.images` alone, because an explicit value wins over the file
  * convention. Pass `image` only to override a route with a real photograph.
  */
 export function buildMetadata({
+  locale = defaultLocale,
   title,
   description,
   path = "/",
@@ -25,7 +32,9 @@ export function buildMetadata({
   publishedTime,
   absoluteTitle = false,
 } = {}) {
+  const { site } = getContent(locale);
   const resolvedDescription = description || site.metaDescription;
+  const alternates = localeAlternates(path);
 
   /* Open Graph has no title template, so the brand is appended here — unless
      the page already carries it (the home page does), which would otherwise
@@ -40,13 +49,19 @@ export function buildMetadata({
     title: absoluteTitle ? { absolute: title } : title,
     description: resolvedDescription,
     alternates: {
-      canonical: path,
+      canonical: localeHref(locale, path),
+      /* Both languages, plus x-default pointing at English for a reader whose
+         language matches neither. */
+      languages: { ...alternates, "x-default": alternates[defaultLocale] },
     },
     openGraph: {
       type,
       siteName: site.name,
-      locale: "en_GB",
-      url: path,
+      locale: locale === "az" ? "az_AZ" : "en_GB",
+      alternateLocale: Object.keys(alternates)
+        .filter((code) => code !== locale)
+        .map((code) => (code === "az" ? "az_AZ" : "en_GB")),
+      url: localeHref(locale, path),
       title: socialTitle,
       description: resolvedDescription,
       ...(image ? { images: [image] } : {}),
@@ -104,7 +119,12 @@ export function trimDescription(text, max = 155) {
   return `${truncated}…`;
 }
 
-/** Absolute URL for structured data, which may not use relative paths. */
+/**
+ * Absolute URL for structured data, which may not use relative paths.
+ *
+ * The origin is the same in both languages — one site, one domain — so this
+ * reads it from the default dictionary rather than taking a locale.
+ */
 export function absoluteUrl(path = "/") {
-  return new URL(path, site.url).toString();
+  return new URL(path, getContent(defaultLocale).site.url).toString();
 }

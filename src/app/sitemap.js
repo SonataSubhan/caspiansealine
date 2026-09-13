@@ -1,25 +1,39 @@
-import { site } from "@/content/en/site";
-import { services } from "@/content/en/services";
-import { ports } from "@/content/en/network";
-import { getArticles } from "@/content/en/news";
-import { getLegalDocuments } from "@/content/en/legal";
+import { defaultLocale, getContent, localeAlternates, localeHref, locales } from "@/content";
 
 /**
- * XML sitemap, generated from the content layer.
+ * XML sitemap, generated from the content layer, in every language.
  *
  * Because the routes are derived rather than listed, a new service or port is
  * in the sitemap the moment it is in the content file — there is no second
- * list to forget to update.
+ * list to forget to update, and no chance of one language having a page the
+ * other's sitemap does not.
+ *
+ * Each entry carries the full `alternates.languages` set. That is the sitemap
+ * half of the hreflang contract: the pages declare each other in their `<head>`
+ * and the sitemap declares them again here, which is what Google's
+ * documentation asks for and what stops one language being treated as a
+ * duplicate of the other.
  */
 export default function sitemap() {
   const now = new Date();
+  const { services, ports, articles, legalDocuments } = getContent(defaultLocale);
+  const { site } = getContent(defaultLocale);
 
-  const entry = (path, priority, changeFrequency = "monthly", lastModified = now) => ({
-    url: `${site.url}${path}`,
-    lastModified,
-    changeFrequency,
-    priority,
-  });
+  const entry = (path, priority, changeFrequency = "monthly", lastModified = now) => {
+    const alternates = localeAlternates(path);
+
+    return locales.map((locale) => ({
+      url: `${site.url}${localeHref(locale, path)}`,
+      lastModified,
+      changeFrequency,
+      priority,
+      alternates: {
+        languages: Object.fromEntries(
+          Object.entries(alternates).map(([code, href]) => [code, `${site.url}${href}`])
+        ),
+      },
+    }));
+  };
 
   return [
     entry("/", 1, "weekly"),
@@ -37,11 +51,11 @@ export default function sitemap() {
     entry("/certifications", 0.6),
     entry("/careers", 0.6),
     entry("/news", 0.7, "weekly"),
-    ...getArticles().map((article) =>
+    ...articles.map((article) =>
       entry(`/news/${article.slug}`, 0.6, "yearly", new Date(article.date))
     ),
     entry("/quote", 0.9),
     entry("/contact", 0.8),
-    ...getLegalDocuments().map((doc) => entry(`/legal/${doc.slug}`, 0.3, "yearly")),
-  ];
+    ...legalDocuments.map((doc) => entry(`/legal/${doc.slug}`, 0.3, "yearly")),
+  ].flat();
 }

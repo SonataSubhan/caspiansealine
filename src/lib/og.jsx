@@ -49,7 +49,12 @@ const ASSETS = join(process.cwd(), "src/lib/og-assets");
 
 /* Read once per build, not once per card. Satori cannot read woff2, so the
    variable font is instanced to two static TTFs (400 and 800) — see
-   ARCHITECTURE.md §6. The logo and symbol are PNGs for the same reason. */
+   ARCHITECTURE.md §6. The logo and symbol are PNGs for the same reason.
+   
+   Both TTFs merge Mulish's `latin` AND `latin-ext` subsets. The latin subset
+   alone has no `ə`, `ğ` or `ş`, so an Azerbaijani card rendered "Xidmətlər" as
+   "Xidm tl r" — every missing glyph silently dropped, on the one image a
+   reader sees before deciding whether to click. */
 let assets;
 
 async function loadAssets() {

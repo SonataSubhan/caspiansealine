@@ -14,7 +14,7 @@ import Grid from "@/components/layout/Grid";
  * inherits the card's hover state, so the card has one focusable target rather
  * than two that go to the same place.
  */
-export default function ServicePillars({ content, pillars, headingId = "services-title" }) {
+export default function ServicePillars({ content, pillars, ui, headingId = "services-title" }) {
   return (
     <Section surface="subtle" aria-labelledby={headingId}>
       <SectionHead
@@ -47,7 +47,7 @@ export default function ServicePillars({ content, pillars, headingId = "services
                 ))}
               </ul>
               <CardFoot>
-                <LinkArrow as="span">Explore</LinkArrow>
+                <LinkArrow as="span">{ui.common.explore}</LinkArrow>
               </CardFoot>
             </CardBody>
           </Card>

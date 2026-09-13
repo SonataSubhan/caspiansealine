@@ -6,7 +6,7 @@ import Stack from "@/components/layout/Stack";
 import LaneTable from "./LaneTable";
 
 /** Trade lanes plus the list of ports called. */
-export default function NetworkPreview({ content, lanes, ports }) {
+export default function NetworkPreview({ content, lanes, ports, locale, ui }) {
   return (
     <Section aria-labelledby="network-title">
       <SectionHead
@@ -21,11 +21,11 @@ export default function NetworkPreview({ content, lanes, ports }) {
         }
       />
 
-      <LaneTable lanes={lanes} />
+      <LaneTable lanes={lanes} locale={locale} ui={ui} />
 
       <Stack gap="sm" className="b-network__footer" id="ports">
         <Eyebrow tone="plain" className="t-meta">
-          Ports we call
+          {ui.sections.portsWeCall}
         </Eyebrow>
         <ul className="b-network__ports" role="list">
           {ports.map((port) => (

@@ -193,7 +193,3 @@ export const agentsPage = {
   lead:
     "Own offices where the volume justifies it, appointed agents everywhere else — held to the same reporting standard either way.",
 };
-
-export function getPort(slug) {
-  return ports.find((port) => port.slug === slug);
-}

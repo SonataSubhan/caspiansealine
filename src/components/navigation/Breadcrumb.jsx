@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { getContent, localeHref } from "@/content";
+
 /**
  * Breadcrumb trail for inner pages.
  *
@@ -7,12 +9,14 @@ import Link from "next/link";
  * structured data on the page, so the two can never disagree — which is what
  * Google penalises.
  */
-export default function Breadcrumb({ items }) {
+export default function Breadcrumb({ items, locale }) {
+  const { ui } = getContent(locale);
+
   return (
-    <nav className="breadcrumb" aria-label="Breadcrumb">
+    <nav className="breadcrumb" aria-label={ui.a11y.breadcrumb}>
       <ol>
         <li>
-          <Link href="/">Home</Link>
+          <Link href={localeHref(locale, "/")}>{ui.common.home}</Link>
         </li>
         {items.map((item, index) => {
           const last = index === items.length - 1;

@@ -8,9 +8,10 @@ import SpecList from "@/components/primitives/SpecList";
 import Section from "@/components/layout/Section";
 import SectionHead from "@/components/layout/SectionHead";
 import Grid from "@/components/layout/Grid";
+import { localeHref } from "@/content";
 
 /** Vessel cards. Used on the home page (3 shown) and on /fleet (all). */
-export default function FleetGrid({ content, vessels, surface = "subtle", headingId = "fleet-title", linked = true }) {
+export default function FleetGrid({ locale,  content, vessels, surface = "subtle", headingId = "fleet-title", linked = true }) {
   return (
     <Section surface={surface} aria-labelledby={headingId}>
       <SectionHead
@@ -30,12 +31,12 @@ export default function FleetGrid({ content, vessels, surface = "subtle", headin
       <Grid cols={3}>
         {vessels.map((vessel) => (
           <Card className="vessel-card" key={vessel.slug}>
-            <Media slot={vessel.slug} width={960} height={600} flush sizes="(max-width: 599px) 100vw, 33vw" />
+            <Media locale={locale} slot={vessel.slug} width={960} height={600} flush sizes="(max-width: 599px) 100vw, 33vw" />
             <CardBody>
               <Badge tone={vessel.accent}>{vessel.type}</Badge>
               <h3 className="card__title t-h4">
                 {linked ? (
-                  <Link className="card__link" href="/fleet">
+                  <Link className="card__link" href={localeHref(locale, "/fleet")}>
                     {vessel.name}
                   </Link>
                 ) : (

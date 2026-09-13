@@ -9,7 +9,7 @@
  * pages read `getArticles()` and `getArticle(slug)`, not the array.
  */
 
-const articles = [
+export const articles = [
   {
     slug: "fourth-weekly-departure-baku-kuryk",
     title: "Fourth weekly departure added on the Baku–Kuryk lane",
@@ -56,19 +56,3 @@ export const newsPage = {
   title: "Latest from Caspian Sea Line.",
   lead: "Network changes, operational updates and company announcements.",
 };
-
-export function getArticles() {
-  return [...articles].sort((a, b) => (a.date < b.date ? 1 : -1));
-}
-
-export function getArticle(slug) {
-  return articles.find((article) => article.slug === slug);
-}
-
-export function formatDate(iso) {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}

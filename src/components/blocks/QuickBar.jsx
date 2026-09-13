@@ -9,9 +9,9 @@ import RuleGrid from "@/components/layout/RuleGrid";
  * separated, each one a single link — the four things a visitor most often
  * arrives wanting to do.
  */
-export default function QuickBar({ items }) {
+export default function QuickBar({ items, ui }) {
   return (
-    <section className="b-quickbar" aria-label="Quick actions">
+    <section className="b-quickbar" aria-label={ui.a11y.quickActions}>
       <Container>
         <RuleGrid cols={4} className="b-quickbar__grid">
           {items.map((item) => (

@@ -12,7 +12,7 @@ import Cluster from "@/components/layout/Cluster";
  * That is what puts the h1's left edge on the same vertical line as every
  * heading below it. Below 900px the media stacks underneath.
  */
-export default function Hero({ eyebrow, titleLead, titleAccent, titleTail, lead, actions, image }) {
+export default function Hero({ locale,  eyebrow, titleLead, titleAccent, titleTail, lead, actions, image }) {
   return (
     <section className="b-hero" data-surface="inverse" aria-labelledby="hero-title">
       <Container className="b-hero__inner">
@@ -34,7 +34,7 @@ export default function Hero({ eyebrow, titleLead, titleAccent, titleTail, lead,
       </Container>
 
       <div className="b-hero__media">
-        <Media slot={image.slot} width={image.width} height={image.height} note={image.note} preload sizes="(max-width: 899px) 100vw, 50vw" />
+        <Media locale={locale} slot={image.slot} width={image.width} height={image.height} note={image.note} preload sizes="(max-width: 899px) 100vw, 50vw" />
       </div>
     </section>
   );

@@ -6,7 +6,7 @@ import Link from "next/link";
 import Button from "@/components/primitives/Button";
 import Field from "@/components/primitives/Field";
 import { submitForm, FORM_STATUS } from "@/lib/forms";
-import { site } from "@/content/en/site";
+import { localeHref } from "@/content";
 
 /**
  * The quote and contact forms.
@@ -19,7 +19,16 @@ import { site } from "@/content/en/site";
  * catches most automated spam without a CAPTCHA, which costs real users time
  * and fails accessibility.
  */
-export default function EnquiryForm({ variant = "contact", cargoTypes = [], services = [], subjects = [] }) {
+export default function EnquiryForm({
+  variant = "contact",
+  locale,
+  site,
+  ui,
+  cargoTypes = [],
+  services = [],
+  subjects = [],
+}) {
+  const { form } = ui;
   const uid = useId();
   const [status, setStatus] = useState(FORM_STATUS.idle);
 
@@ -40,33 +49,33 @@ export default function EnquiryForm({ variant = "contact", cargoTypes = [], serv
   return (
     <form onSubmit={handleSubmit} noValidate={false}>
       <div className="form-grid">
-        <Field id={`${uid}-name`} label="Your name" required>
+        <Field id={`${uid}-name`} label={form.name} required>
           {(props) => <input className="input" type="text" name="name" autoComplete="name" {...props} />}
         </Field>
 
-        <Field id={`${uid}-company`} label="Company" required>
+        <Field id={`${uid}-company`} label={form.company} required>
           {(props) => <input className="input" type="text" name="company" autoComplete="organization" {...props} />}
         </Field>
 
-        <Field id={`${uid}-email`} label="Email" required>
+        <Field id={`${uid}-email`} label={form.email} required>
           {(props) => <input className="input" type="email" name="email" autoComplete="email" {...props} />}
         </Field>
 
-        <Field id={`${uid}-phone`} label="Phone" hint="Optional, but faster for a live shipment.">
+        <Field id={`${uid}-phone`} label={form.phone} hint={form.phoneHint}>
           {(props) => <input className="input" type="tel" name="phone" autoComplete="tel" {...props} />}
         </Field>
 
         {isQuote ? (
           <>
-            <Field id={`${uid}-origin`} label="Origin" hint="City, port or plant." required>
+            <Field id={`${uid}-origin`} label={form.origin} hint={form.originHint} required>
               {(props) => <input className="input" type="text" name="origin" {...props} />}
             </Field>
 
-            <Field id={`${uid}-destination`} label="Destination" required>
+            <Field id={`${uid}-destination`} label={form.destination} required>
               {(props) => <input className="input" type="text" name="destination" {...props} />}
             </Field>
 
-            <Field id={`${uid}-cargo`} label="Cargo type" required>
+            <Field id={`${uid}-cargo`} label={form.cargoType} required>
               {(props) => (
                 <select className="select" name="cargoType" defaultValue="" {...props}>
                   <option value="" disabled>
@@ -81,7 +90,7 @@ export default function EnquiryForm({ variant = "contact", cargoTypes = [], serv
               )}
             </Field>
 
-            <Field id={`${uid}-service`} label="Scope required" required>
+            <Field id={`${uid}-service`} label={form.scope} required>
               {(props) => (
                 <select className="select" name="scope" defaultValue="" {...props}>
                   <option value="" disabled>
@@ -98,22 +107,22 @@ export default function EnquiryForm({ variant = "contact", cargoTypes = [], serv
 
             <Field
               id={`${uid}-details`}
-              label="Cargo details"
-              hint="Weight, dimensions, number of units, packaging, and anything unusual."
+              label={form.cargoDetails}
+              hint={form.cargoDetailsHint}
             >
               {(props) => <input className="input" type="text" name="cargoDetails" {...props} />}
             </Field>
 
-            <Field id={`${uid}-date`} label="Required delivery date">
+            <Field id={`${uid}-date`} label={form.deliveryDate}>
               {(props) => <input className="input" type="date" name="requiredDate" {...props} />}
             </Field>
           </>
         ) : (
-          <Field id={`${uid}-subject`} label="Subject" required>
+          <Field id={`${uid}-subject`} label={form.subject} required>
             {(props) => (
               <select className="select" name="subject" defaultValue="" {...props}>
                 <option value="" disabled>
-                  Select…
+                  {form.selectPlaceholder}
                 </option>
                 {subjects.map((subject) => (
                   <option key={subject} value={subject}>
@@ -126,27 +135,27 @@ export default function EnquiryForm({ variant = "contact", cargoTypes = [], serv
         )}
 
         <div className="is-full">
-          <Field id={`${uid}-message`} label="Message" required>
+          <Field id={`${uid}-message`} label={form.message} required>
             {(props) => <textarea className="textarea" name="message" rows={6} minLength={10} {...props} />}
           </Field>
         </div>
 
         {/* Honeypot — hidden from people, irresistible to bots. */}
         <div className="visually-hidden" aria-hidden="true">
-          <label htmlFor={`${uid}-website`}>Leave this field empty</label>
+          <label htmlFor={`${uid}-website`}>{form.honeypot}</label>
           <input id={`${uid}-website`} name="website" type="text" tabIndex={-1} autoComplete="off" />
         </div>
 
         <div className="is-full">
           <p className="t-body-s t-muted">
-            We use these details only to answer your enquiry. See our{" "}
-            <Link href="/legal/privacy">privacy notice</Link>.
+            {form.privacyNote}{" "}
+            <Link href={localeHref(locale, "/legal/privacy")}>{form.privacyLink}</Link>.
           </p>
         </div>
 
         <div className="is-full">
           <Button type="submit" size="lg" arrow disabled={status === FORM_STATUS.submitting}>
-            {status === FORM_STATUS.submitting ? "Sending…" : isQuote ? "Request a quote" : "Send message"}
+            {status === FORM_STATUS.submitting ? form.sending : isQuote ? form.submitQuote : form.submitMessage}
           </Button>
         </div>
       </div>
@@ -155,17 +164,17 @@ export default function EnquiryForm({ variant = "contact", cargoTypes = [], serv
         {status === FORM_STATUS.success ? (
           <div className="notice" style={{ borderInlineStartColor: "var(--brand-green)", marginBlockStart: "var(--space-md)" }}>
             <p className="notice__title" style={{ color: "var(--brand-green)" }}>
-              Sent
+              {form.successTitle}
             </p>
-            <p>Thank you — an operator will come back to you, normally within one business day.</p>
+            <p>{form.success}</p>
           </div>
         ) : null}
 
         {status === FORM_STATUS.error ? (
           <div className="notice" style={{ marginBlockStart: "var(--space-md)" }}>
-            <p className="notice__title">Not sent</p>
+            <p className="notice__title">{form.failureTitle}</p>
             <p>
-              Something went wrong on our side. Please email{" "}
+              {form.failureBody}{" "}
               <a href={`mailto:${site.contact.operationsEmail}`}>{site.contact.operationsEmail}</a> or call{" "}
               <a href={site.contact.phoneHref}>{site.contact.phone}</a>.
             </p>
@@ -174,11 +183,9 @@ export default function EnquiryForm({ variant = "contact", cargoTypes = [], serv
 
         {status === FORM_STATUS.unconfigured ? (
           <div className="notice" style={{ marginBlockStart: "var(--space-md)" }}>
-            <p className="notice__title">Form endpoint not connected</p>
+            <p className="notice__title">{form.unconfiguredTitle}</p>
             <p>
-              TODO(build): this form has no back end yet, so nothing was sent. Set
-              <code> NEXT_PUBLIC_FORM_ENDPOINT</code> and the submission will go through unchanged.
-              In the meantime, email{" "}
+              {form.unconfiguredBody}{" "}
               <a href={`mailto:${site.contact.operationsEmail}`}>{site.contact.operationsEmail}</a>.
             </p>
           </div>

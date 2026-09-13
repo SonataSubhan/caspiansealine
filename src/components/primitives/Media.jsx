@@ -1,11 +1,15 @@
 import Image from "next/image";
 
-import { getMedia } from "@/content/en/media";
+import { getContent } from "@/content";
 
 /**
  * Every image slot on the site goes through this component.
  *
- * A slot resolves against the registry in `content/en/media.js`. If a
+ * A slot resolves against the reader's language registry (`<locale>/media.js`),
+ * because the alt text is prose and prose is translated. The file itself is the
+ * same in both languages — see `content/media-sources.js`.
+ *
+ * A slot resolves against that registry. If a
  * photograph is registered it is rendered; if not, the slot renders a labelled
  * brand plate stating the exact asset size it expects, rather than a broken
  * image or an invented one. The box is identical either way, so dropping the
@@ -24,6 +28,7 @@ const RATIOS = {
 export default function Media({
   src,
   alt,
+  locale,
   slot = "image",
   width,
   height,
@@ -40,7 +45,7 @@ export default function Media({
 
   const style = !ratio && width && height ? { "--media-ratio": `${width} / ${height}` } : undefined;
 
-  const registered = getMedia(slot);
+  const registered = getContent(locale).media[slot];
   const resolvedSrc = src || registered?.src;
   const resolvedAlt = alt ?? registered?.alt ?? "";
 

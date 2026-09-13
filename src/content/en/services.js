@@ -442,14 +442,6 @@ export const services = [
   },
 ];
 
-export function getService(slug) {
-  return services.find((service) => service.slug === slug);
-}
-
-export function servicesByCategory(categoryId) {
-  return services.filter((service) => service.category === categoryId);
-}
-
 export const servicesPage = {
   meta: {
     title: "Services",

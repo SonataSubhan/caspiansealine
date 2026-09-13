@@ -7,10 +7,11 @@ import Media from "@/components/primitives/Media";
 import Section from "@/components/layout/Section";
 import SectionHead from "@/components/layout/SectionHead";
 import Grid from "@/components/layout/Grid";
-import { formatDate } from "@/content/en/news";
+import { formatDate } from "@/content/lookup";
+import { localeHref } from "@/content";
 
 /** Article cards. Shared by the home page and /news. */
-export default function NewsGrid({ content, articles, headingId = "news-title", surface }) {
+export default function NewsGrid({ content, articles, locale, ui, headingId = "news-title", surface }) {
   return (
     <Section surface={surface} aria-labelledby={headingId}>
       <SectionHead
@@ -30,21 +31,21 @@ export default function NewsGrid({ content, articles, headingId = "news-title", 
       <Grid cols={3}>
         {articles.map((article) => (
           <Card className="news-card" key={article.slug}>
-            <Media slot={`news-${article.slug}`} width={960} height={540} flush sizes="(max-width: 599px) 100vw, 33vw" />
+            <Media locale={locale} slot={`news-${article.slug}`} width={960} height={540} flush sizes="(max-width: 599px) 100vw, 33vw" />
             <CardBody>
               <p className="news-card__meta">
-                <time dateTime={article.date}>{formatDate(article.date)}</time>
+                <time dateTime={article.date}>{formatDate(article.date, locale)}</time>
                 <span aria-hidden="true">·</span>
                 <span>{article.category}</span>
               </p>
               <h3 className="news-card__title t-h5">
-                <Link className="card__link" href={`/news/${article.slug}`}>
+                <Link className="card__link" href={localeHref(locale, `/news/${article.slug}`)}>
                   {article.title}
                 </Link>
               </h3>
               <p className="card__text">{article.summary}</p>
               <CardFoot>
-                <LinkArrow as="span">Read</LinkArrow>
+                <LinkArrow as="span">{ui.common.read}</LinkArrow>
               </CardFoot>
             </CardBody>
           </Card>
