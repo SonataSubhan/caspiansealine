@@ -45,6 +45,7 @@ src/
 │   ├── icon.svg             Favicon (SVG)
 │   ├── favicon.ico          Favicon (legacy, multi-size)
 │   ├── apple-icon.png       180×180
+│   ├── opengraph-image.js   The default share card (one per segment below, too)
 │   ├── sitemap.js           Generated from the content layer
 │   ├── robots.js
 │   ├── not-found.js
@@ -75,6 +76,8 @@ src/
 └── lib/
     ├── seo.js               buildMetadata() — one metadata builder for every page
     ├── schema.js            JSON-LD generators + the <JsonLd> component
+    ├── og.jsx               ogCard() — the 1200×630 share card, one renderer
+    ├── og-assets/           Logo + symbol PNGs and two static Mulish TTFs
     └── forms.js             The single form submission integration point
 ```
 
@@ -150,6 +153,38 @@ Russian:
   the sitemap the moment it exists.
 - One `h1` per page, no skipped heading levels — verified across all routes at six
   viewport widths.
+- Descriptions are trimmed by `trimDescription()`, which cuts at the last full sentence
+  that fits and otherwise at a word boundary, dropping a dangling conjunction. A hard
+  `.slice(155)` stops mid-word, in the one piece of copy a searcher reads before clicking.
+
+### Share cards (`og:image`)
+
+Pasting a link into WhatsApp, Telegram, LinkedIn, Slack, X or iMessage shows whatever
+`og:image` points at. **Every route generates its own 1200×630 card at build time** — the
+logo on brand navy, the page's own title, the symbol used as a watermark, and the
+cyan/red/green rule from the guidelines:
+
+- `src/lib/og.jsx` holds the single `ogCard()` renderer. Nothing else draws a card.
+- A route opts in with a six-line `opengraph-image.js` beside its `page.js`, reading the
+  title from the same content file the page reads — the card cannot drift from the page.
+  Dynamic segments (`services/[slug]`, `news/[slug]`, `network/ports/[slug]`,
+  `legal/[slug]`) export their own `generateStaticParams`, so every service, article, port
+  and document gets its own card.
+- The root `app/opengraph-image.js` is the fallback for anything without one.
+- `buildMetadata()` deliberately does **not** set `openGraph.images`. An explicit value
+  overrides the file convention, which is exactly the bug that shipped before: it pointed
+  at `/og/default.jpg`, a file that never existed, so every shared link showed a grey box.
+  Pass `image` only to override one route with a real photograph.
+- Next derives `og:image:width/height/type/alt` and the whole `twitter:image` set from the
+  same file, so there is no second copy to keep in sync.
+
+No photography is invented for these cards. They are built from approved brand artwork
+only, which is why they are already correct and stay correct when real photography lands.
+
+> Satori (the renderer behind `ImageResponse`) cannot read woff2 and cannot load `<Image>`,
+> so `src/lib/og-assets/` holds two static Mulish TTF instances (400 and 800) generated
+> from the same variable font the site ships, plus PNG renders of the white logo and
+> symbol. ~130 KB, build-time only, never sent to a browser.
 
 ---
 

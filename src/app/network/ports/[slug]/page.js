@@ -8,7 +8,7 @@ import Stack from "@/components/layout/Stack";
 import PageHero from "@/components/blocks/PageHero";
 import CtaBand from "@/components/blocks/CtaBand";
 
-import { buildMetadata } from "@/lib/seo";
+import { buildMetadata, trimDescription } from "@/lib/seo";
 import { JsonLd, webPageSchema, breadcrumbSchema } from "@/lib/schema";
 
 import { ports, getPort } from "@/content/en/network";
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }) {
 
   return buildMetadata({
     title: `${port.name}, ${port.country}`,
-    description: `${port.role} ${port.intro}`.slice(0, 155),
+    description: trimDescription(`${port.role} ${port.intro}`),
     path: `/network/ports/${port.slug}`,
   });
 }
