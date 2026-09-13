@@ -35,8 +35,8 @@ export default function CareersPage() {
       <PageHero eyebrow={careers.eyebrow} title={careers.title} lead={careers.lead} breadcrumb={BREADCRUMB} />
 
       <Section>
-        <Split ratio="copyNarrow">
-          <Media slot="careers" width={1000} height={1250} ratio="portrait" sizes="(max-width: 899px) 100vw, 40vw" />
+        <Split ratio="copyNarrow" align="start">
+          <Media slot="careers" width={1200} height={900} ratio="hero" sizes="(max-width: 899px) 100vw, 40vw" />
           <Stack gap="lg">
             <Prose paragraphs={careers.paragraphs} />
             <Button href={`mailto:${site.contact.generalEmail}`} arrow>

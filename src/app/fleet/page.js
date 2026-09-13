@@ -76,7 +76,7 @@ export default function FleetPage() {
       ))}
 
       <Section aria-labelledby="charter-title">
-        <Split ratio="copyNarrow">
+        <Split ratio="copyNarrow" align="start">
           <Stack gap="lg">
             <h2 className="t-h3" id="charter-title">
               {fleetPage.charter.title}

@@ -38,9 +38,9 @@ export default function AboutPage() {
       <PageHero eyebrow={about.eyebrow} title={about.title} lead={about.lead} breadcrumb={BREADCRUMB} />
 
       <Section>
-        <Split ratio="copyNarrow">
+        <Split ratio="copyNarrow" align="start">
           <Stack gap="lg">
-            <Media slot="about" width={1000} height={1250} ratio="portrait" sizes="(max-width: 899px) 100vw, 40vw" />
+            <Media slot="about" width={1200} height={900} ratio="hero" sizes="(max-width: 899px) 100vw, 40vw" />
             <SpecList items={site.facts} />
           </Stack>
           <Prose paragraphs={about.paragraphs} />

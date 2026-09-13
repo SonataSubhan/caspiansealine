@@ -57,9 +57,14 @@ export default function SustainabilityPage() {
       </Section>
 
       <Section>
-        <Split ratio="copyNarrow">
-          <Media slot="sustainability" width={1000} height={1250} ratio="portrait" sizes="(max-width: 899px) 100vw, 40vw" />
-          <Prose paragraphs={sustainability.paragraphs} />
+        <Split ratio="copyNarrow" align="start">
+          <Media slot="sustainability" width={1200} height={900} ratio="hero" sizes="(max-width: 899px) 100vw, 40vw" />
+          <Stack gap="lg">
+            <Prose paragraphs={sustainability.paragraphs} />
+            <Button href={sustainability.link.href} variant="secondary" arrow>
+              {sustainability.link.label}
+            </Button>
+          </Stack>
         </Split>
       </Section>
 
@@ -78,14 +83,6 @@ export default function SustainabilityPage() {
             ))}
           </RuleGrid>
         </div>
-      </Section>
-
-      <Section spacing="tight">
-        <Stack gap="md">
-          <Button href={sustainability.link.href} variant="secondary" arrow>
-            {sustainability.link.label}
-          </Button>
-        </Stack>
       </Section>
 
       <CtaBand {...home.cta} />

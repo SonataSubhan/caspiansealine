@@ -34,7 +34,7 @@ export default function Hero({ eyebrow, titleLead, titleAccent, titleTail, lead,
       </Container>
 
       <div className="b-hero__media">
-        <Media slot={image.slot} width={image.width} height={image.height} note={image.note} priority sizes="50vw" />
+        <Media slot={image.slot} width={image.width} height={image.height} note={image.note} preload sizes="(max-width: 899px) 100vw, 50vw" />
       </div>
     </section>
   );

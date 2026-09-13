@@ -55,10 +55,30 @@
   z-index: 0;
 }
 
+/* Fades the photograph into the navy field so the two halves read as one
+   surface instead of two panels butted together. */
+.b-hero__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: linear-gradient(
+    to right,
+    var(--brand-navy) 0%,
+    color-mix(in srgb, var(--brand-navy) 55%, transparent) 16%,
+    transparent 42%
+  );
+}
+
+.b-hero__media .media,
 .b-hero__media .media-placeholder {
   block-size: 100%;
   border: 0;
   border-radius: 0;
+  /* The hero pane is a tall crop of a landscape frame, so the intrinsic
+     aspect ratio is overridden and object-fit does the work. */
+  aspect-ratio: auto;
 }
 
 /* Strata motif over the navy, fading out before it reaches the media. */
@@ -85,6 +105,16 @@
     position: relative;
     inline-size: 100%;
     block-size: clamp(14rem, 50vw, 22rem);
+  }
+
+  /* Stacked, the seam is horizontal, so the fade turns with it. */
+  .b-hero__media::after {
+    background-image: linear-gradient(
+      to bottom,
+      var(--brand-navy) 0%,
+      color-mix(in srgb, var(--brand-navy) 50%, transparent) 14%,
+      transparent 40%
+    );
   }
   .b-hero::before { inline-size: 100%; }
 }

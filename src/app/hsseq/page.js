@@ -34,8 +34,8 @@ export default function HsseqPage() {
       <PageHero eyebrow={hsseq.eyebrow} title={hsseq.title} lead={hsseq.lead} breadcrumb={BREADCRUMB} />
 
       <Section>
-        <Split ratio="copyNarrow">
-          <Media slot="hsseq" width={1000} height={1250} ratio="portrait" sizes="(max-width: 899px) 100vw, 40vw" />
+        <Split ratio="copyNarrow" align="start">
+          <Media slot="hsseq" width={1200} height={900} ratio="hero" sizes="(max-width: 899px) 100vw, 40vw" />
           <Prose paragraphs={hsseq.paragraphs} />
         </Split>
       </Section>

@@ -28,7 +28,7 @@ export default function Logo({ variant = "navy", height, href = "/", className =
         alt="Caspian Sea Line"
         width={296}
         height={103}
-        priority
+        loading="eager"
       />
     </Link>
   );
