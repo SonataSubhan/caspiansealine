@@ -1,0 +1,249 @@
+/* ==========================================================================
+   CASPIAN SEA LINE — DESIGN TOKENS
+   Single source of truth. Nothing below this file may hard-code a value
+   that exists here. Ported 1:1 to Tailwind v4 `@theme` in the Next.js build.
+   Source of truth for brand values: "Brand guidelines logo.pdf" (8 pp).
+   ========================================================================== */
+
+:root {
+  /* ---------------------------------------------------------------------
+     1. BRAND PRIMITIVES  — brandbook p.5, do not invent new brand colours
+     --------------------------------------------------------------------- */
+  --brand-navy:  #041e42; /* PANTONE 282 C — primary, logotype + key surfaces */
+  --brand-cyan:  #18b4df; /* PANTONE 305 C — accent 1 (interaction)           */
+  --brand-red:   #ee3441; /* PANTONE 1795 C — accent 2 (alert / emphasis)     */
+  --brand-green: #539f45; /* PANTONE 362 C — accent 3 (sustainability)        */
+
+  /* Neutral ramp — all derived from navy so greys never look "web default" */
+  --neutral-000: #ffffff;
+  --neutral-025: #f7f9fb;
+  --neutral-050: #f1f4f8;
+  --neutral-100: #e6ebf1;
+  --neutral-200: #d3dbe5;
+  --neutral-300: #b3bfcd;
+  --neutral-400: #8697ab;
+  --neutral-500: #5f7288;
+  --neutral-600: #445a73;
+  --neutral-700: #2a4160;
+  --neutral-800: #0e2c50;
+  --neutral-900: #041e42;
+  --neutral-950: #02142d;
+
+  /* Navy interaction steps */
+  --navy-hover:  #0a2b57;
+  --navy-active: #021530;
+
+  /* Accent interaction steps */
+  --cyan-hover:  #0f9cc4;
+  --cyan-soft:   #e7f7fc;
+  --red-soft:    #fdecee;
+  --green-hover: #468838;
+  --green-soft:  #eef6ec;
+
+  /* ---------------------------------------------------------------------
+     2. SEMANTIC COLOUR  — components reference ONLY these
+     --------------------------------------------------------------------- */
+  --surface-page:     var(--neutral-000);
+  --surface-subtle:   var(--neutral-050);
+  --surface-raised:   var(--neutral-000);
+  --surface-inverse:  var(--brand-navy);
+  --surface-inverse-2:var(--neutral-950);
+  --surface-accent:   var(--cyan-soft);
+
+  --text-primary:     #0b2038;
+  --text-secondary:   var(--neutral-600);
+  --text-tertiary:    var(--neutral-500);
+  --text-inverse:     var(--neutral-000);
+  --text-inverse-mute:rgba(255, 255, 255, 0.68);
+  --text-brand:       var(--brand-navy);
+
+  --border-subtle:    rgba(4, 30, 66, 0.10);
+  --border-default:   rgba(4, 30, 66, 0.16);
+  --border-strong:    rgba(4, 30, 66, 0.30);
+  --border-inverse:   rgba(255, 255, 255, 0.16);
+  --border-inverse-s: rgba(255, 255, 255, 0.32);
+
+  --link:             var(--brand-navy);
+  --link-hover:       var(--cyan-hover);
+  --focus-ring:       var(--brand-cyan);
+
+  /* ---------------------------------------------------------------------
+     3. TYPOGRAPHY  — Mulish is the only approved typeface (brandbook p.6)
+     --------------------------------------------------------------------- */
+  --font-sans: "Mulish", ui-sans-serif, system-ui, -apple-system,
+               "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, monospace;
+
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+  --fw-black:    800;
+
+  /* Fluid scale — 375px → 1440px viewport. No breakpoint jumps anywhere. */
+  --text-2xs:  0.6875rem;                                     /* 11    */
+  --text-xs:   0.75rem;                                       /* 12    */
+  --text-sm:   0.8125rem;                                     /* 13    */
+  --text-md:   0.9375rem;                                     /* 15    */
+  --text-base: clamp(1rem, 0.964rem + 0.15vw, 1.0625rem);     /* 16→17 */
+  --text-lg:   clamp(1.0625rem, 0.99rem + 0.31vw, 1.1875rem); /* 17→19 */
+  --text-xl:   clamp(1.25rem, 1.13rem + 0.5vw, 1.5rem);       /* 20→24 */
+  --text-2xl:  clamp(1.5rem, 1.31rem + 0.79vw, 2rem);         /* 24→32 */
+  --text-3xl:  clamp(1.875rem, 1.55rem + 1.38vw, 2.75rem);    /* 30→44 */
+  --text-4xl:  clamp(2.25rem, 1.66rem + 2.51vw, 3.75rem);     /* 36→60 */
+  --text-5xl:  clamp(2.75rem, 1.86rem + 3.76vw, 5rem);        /* 44→80 */
+
+  --lh-tight:  1.06;
+  --lh-snug:   1.18;
+  --lh-heading:1.28;
+  --lh-normal: 1.5;
+  --lh-relaxed:1.65;
+
+  --ls-tighter: -0.03em;
+  --ls-tight:   -0.02em;
+  --ls-snug:    -0.01em;
+  --ls-normal:  0;
+  --ls-wide:    0.06em;
+  --ls-eyebrow: 0.14em;
+
+  /* ---------------------------------------------------------------------
+     4. SPACE  — 4px base grid. Every vertical rhythm resolves to a multiple.
+     --------------------------------------------------------------------- */
+  --space-0:   0;
+  --space-3xs: 0.25rem;  /*  4 */
+  --space-2xs: 0.5rem;   /*  8 */
+  --space-xs:  0.75rem;  /* 12 */
+  --space-sm:  1rem;     /* 16 */
+  --space-md:  1.5rem;   /* 24 */
+  --space-lg:  2rem;     /* 32 */
+  --space-xl:  3rem;     /* 48 */
+  --space-2xl: 4rem;     /* 64 */
+  --space-3xl: 5rem;     /* 80 */
+  --space-4xl: 7rem;     /* 112 */
+  --space-5xl: 10rem;    /* 160 */
+
+  /* Section rhythm — the single knob that controls page density */
+  --section-y:       clamp(3.5rem, 2.1rem + 5.9vw, 7rem);   /* 56 → 112 */
+  --section-y-tight: clamp(2.5rem, 1.7rem + 3.4vw, 4.5rem); /* 40 → 72  */
+  --section-y-loose: clamp(4.5rem, 2.7rem + 7.6vw, 9rem);   /* 72 → 144 */
+
+  /* ---------------------------------------------------------------------
+     5. LAYOUT
+     --------------------------------------------------------------------- */
+  --shell-max:   1440px; /* header / footer / full-bleed grid outer bound */
+  --content-max: 1240px; /* editorial + card grids                        */
+  --narrow-max:  920px;  /* centred intro copy                            */
+  --prose-max:   68ch;   /* long-form measure                             */
+
+  --gutter:   clamp(1.25rem, 0.7rem + 2.3vw, 3rem);   /* 20 → 48 */
+  --grid-gap: clamp(1rem, 0.55rem + 1.9vw, 2rem);     /* 16 → 32 */
+  --grid-columns: 12;
+
+  --header-utility-h: 2.375rem; /* 38 */
+  --header-main-h:    4.75rem;  /* 76 */
+  --header-main-h-sm: 4rem;     /* 64 */
+  --header-h: calc(var(--header-utility-h) + var(--header-main-h));
+
+  /* ---------------------------------------------------------------------
+     6. SHAPE — brandbook geometry is square-cut; radii stay minimal
+     --------------------------------------------------------------------- */
+  --radius-xs:   2px;
+  --radius-sm:   3px;
+  --radius-md:   4px;
+  --radius-lg:   6px;
+  --radius-full: 999px;
+
+  --border-w:      1px;
+  --border-w-thick:2px;
+
+  /* ---------------------------------------------------------------------
+     7. ELEVATION — restrained; the brand reads flat + engineered
+     --------------------------------------------------------------------- */
+  --shadow-xs: 0 1px 2px rgba(4, 30, 66, 0.06);
+  --shadow-sm: 0 2px 8px -2px rgba(4, 30, 66, 0.10);
+  --shadow-md: 0 12px 28px -12px rgba(4, 30, 66, 0.22);
+  --shadow-lg: 0 28px 64px -24px rgba(4, 30, 66, 0.30);
+  --shadow-header: 0 1px 0 rgba(4, 30, 66, 0.10), 0 10px 30px -24px rgba(4, 30, 66, 0.55);
+
+  /* ---------------------------------------------------------------------
+     8. MOTION
+     --------------------------------------------------------------------- */
+  --ease-out:    cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.32, 0.64, 1);
+  --dur-instant: 90ms;
+  --dur-fast:    150ms;
+  --dur-base:    240ms;
+  --dur-slow:    420ms;
+
+  /* ---------------------------------------------------------------------
+     9. Z-INDEX  — never write a raw z-index outside this list
+     --------------------------------------------------------------------- */
+  --z-base:      0;
+  --z-raised:    10;
+  --z-sticky:    100;
+  --z-header:    200;
+  --z-megamenu:  210;
+  --z-drawer:    300;
+  --z-overlay:   290;
+  --z-toast:     400;
+  --z-devtool:   900;
+
+  /* ---------------------------------------------------------------------
+     10. BRAND MOTIF — the logo is a circle cut by horizontal strata.
+         The whole site reuses that rule: hairlines and stripe stacks.
+     --------------------------------------------------------------------- */
+  --motif-stripe-h:  6px;
+  --motif-stripe-gap:5px;
+  --motif-light: repeating-linear-gradient(
+      to bottom,
+      rgba(4, 30, 66, 0.055) 0, rgba(4, 30, 66, 0.055) var(--motif-stripe-h),
+      transparent var(--motif-stripe-h),
+      transparent calc(var(--motif-stripe-h) + var(--motif-stripe-gap)));
+  --motif-dark: repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.07) 0, rgba(255, 255, 255, 0.07) var(--motif-stripe-h),
+      transparent var(--motif-stripe-h),
+      transparent calc(var(--motif-stripe-h) + var(--motif-stripe-gap)));
+  /* The logo's cyan → red → green stacking, used as a 3-part accent rule */
+  --motif-tricolour: linear-gradient(
+      to right,
+      var(--brand-cyan) 0 33.333%,
+      var(--brand-red) 33.333% 66.666%,
+      var(--brand-green) 66.666% 100%);
+}
+
+/* ---------------------------------------------------------------------
+   INVERSE SURFACE CONTEXT
+   Any block can opt into the navy surface by adding `data-surface="inverse"`.
+   Every component below reads the semantic vars, so nothing needs a variant.
+   --------------------------------------------------------------------- */
+[data-surface="inverse"] {
+  --surface-page:   var(--brand-navy);
+  --surface-subtle: var(--neutral-950);
+  --surface-raised: rgba(255, 255, 255, 0.04);
+  --text-primary:   var(--neutral-000);
+  --text-secondary: var(--text-inverse-mute);
+  --text-tertiary:  rgba(255, 255, 255, 0.52);
+  --border-subtle:  var(--border-inverse);
+  --border-default: var(--border-inverse);
+  --border-strong:  var(--border-inverse-s);
+  --link:           var(--neutral-000);
+  --link-hover:     var(--brand-cyan);
+
+  background-color: var(--surface-page);
+  color: var(--text-primary);
+}
+
+[data-surface="subtle"] {
+  background-color: var(--neutral-050);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-instant: 1ms;
+    --dur-fast: 1ms;
+    --dur-base: 1ms;
+    --dur-slow: 1ms;
+  }
+}

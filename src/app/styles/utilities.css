@@ -1,0 +1,26 @@
+/* ==========================================================================
+   UTILITIES — a deliberately small, closed set. If a utility is needed twice
+   in a new way, it belongs in a component instead.
+   ========================================================================== */
+
+.u-text-centre { text-align: center; }
+.u-text-end    { text-align: end; }
+
+.u-measure       { max-inline-size: var(--prose-max); }
+.u-measure-short { max-inline-size: 46ch; }
+
+.u-mt-auto { margin-block-start: auto; }
+
+.u-hide          { display: none !important; }
+@media (max-width: 767px)  { .u-hide\@sm { display: none !important; } }
+@media (min-width: 768px)  { .u-show\@sm { display: none !important; } }
+@media (max-width: 1099px) { .u-hide\@lg { display: none !important; } }
+
+.u-full-height { block-size: 100%; }
+.u-full-width  { inline-size: 100%; }
+
+@media print {
+  .site-header,
+  .drawer,
+  .drawer-overlay { display: none !important; }
+}

@@ -1,0 +1,222 @@
+/* ==========================================================================
+   LAYOUT — the only place that owns width, gutters and vertical rhythm.
+   Rule: a component never sets its own outer margin or page padding.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Containers. Two widths only: the shell (chrome) and the content measure.
+   Both share one gutter token, so every edge on the page lines up vertically.
+   -------------------------------------------------------------------------- */
+.shell,
+.container,
+.container--narrow {
+  inline-size: 100%;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.shell             { max-inline-size: calc(var(--shell-max)   + var(--gutter) * 2); }
+.container         { max-inline-size: calc(var(--content-max) + var(--gutter) * 2); }
+.container--narrow { max-inline-size: calc(var(--narrow-max)  + var(--gutter) * 2); }
+
+/* A child that must escape its container and touch both viewport edges. */
+.full-bleed {
+  inline-size: 100vw;
+  margin-inline: calc(50% - 50vw);
+}
+
+/* --------------------------------------------------------------------------
+   Sections
+   -------------------------------------------------------------------------- */
+.section        { padding-block: var(--section-y); }
+.section--tight { padding-block: var(--section-y-tight); }
+.section--loose { padding-block: var(--section-y-loose); }
+.section--flush-top    { padding-block-start: 0; }
+.section--flush-bottom { padding-block-end: 0; }
+
+/* Section head: eyebrow → title → lead on the left, one optional action on
+   the right. It wraps to a single column below ~700px, which keeps the
+   reading order (title, lead, action) correct on a phone. */
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-md) var(--space-xl);
+  margin-block-end: clamp(var(--space-xl), 4vw, var(--space-2xl));
+}
+
+.section-head__titles {
+  display: grid;
+  gap: var(--space-sm);
+  max-inline-size: 54ch;
+  min-inline-size: min(100%, 22rem);
+  flex: 1 1 22rem;
+}
+
+.section-head__action { flex: none; }
+
+.section-head--centred {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.section-head--centred .section-head__titles {
+  justify-items: center;
+  flex: none;
+}
+
+/* --------------------------------------------------------------------------
+   Grids
+   `--cols` is the desktop column count; the fallbacks below step it down
+   symmetrically so a row is never left with an orphan cell.
+   -------------------------------------------------------------------------- */
+.grid {
+  display: grid;
+  gap: var(--grid-gap);
+  grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr));
+}
+
+.grid--2 { --cols: 2; }
+.grid--3 { --cols: 3; }
+.grid--4 { --cols: 4; }
+
+@media (max-width: 1023px) {
+  .grid--3,
+  .grid--4 { --cols: 2; }
+}
+
+@media (max-width: 599px) {
+  .grid--2,
+  .grid--3,
+  .grid--4 { --cols: 1; }
+}
+
+/* 12-column editorial grid for asymmetric-but-aligned compositions. */
+.grid-12 {
+  display: grid;
+  gap: var(--grid-gap);
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+}
+
+@media (max-width: 899px) {
+  .grid-12 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .grid-12 > * { grid-column: 1 / -1; }
+}
+
+/* --------------------------------------------------------------------------
+   RULE GRID — the brand's core layout device.
+   Cells are separated by true 1px hairlines produced by the grid gap, so the
+   lines can never double up or fall a half-pixel out of alignment.
+   -------------------------------------------------------------------------- */
+.rule-grid {
+  inline-size: 100%;
+  display: grid;
+  gap: var(--border-w);
+  background-color: var(--border-subtle);
+  border-block: var(--border-w) solid var(--border-subtle);
+  grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr));
+}
+
+.rule-grid > * {
+  background-color: var(--surface-page);
+}
+
+.rule-grid--2 { --cols: 2; }
+.rule-grid--3 { --cols: 3; }
+.rule-grid--4 { --cols: 4; }
+.rule-grid--boxed { border: var(--border-w) solid var(--border-subtle); }
+
+@media (max-width: 1023px) {
+  .rule-grid--4 { --cols: 2; }
+  .rule-grid--3 { --cols: 1; }
+}
+
+@media (max-width: 599px) {
+  .rule-grid--2,
+  .rule-grid--4 { --cols: 1; }
+}
+
+/* --------------------------------------------------------------------------
+   Stacks & clusters — replace ad-hoc margins everywhere.
+   -------------------------------------------------------------------------- */
+.stack       { display: grid; gap: var(--space-md); align-content: start; justify-items: start; }
+.stack--xs   { gap: var(--space-2xs); }
+.stack--sm   { gap: var(--space-sm); }
+.stack--lg   { gap: var(--space-lg); }
+.stack--xl   { gap: var(--space-xl); }
+.stack--centre { justify-items: center; text-align: center; }
+
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.cluster--sm { gap: var(--space-2xs); }
+.cluster--lg { gap: var(--space-md) var(--space-lg); }
+
+/* --------------------------------------------------------------------------
+   Split — copy on one side, media on the other. Alternates without a modifier
+   explosion: `data-flip` swaps the visual order only, DOM order is unchanged
+   so the reading order stays correct for screen readers.
+   -------------------------------------------------------------------------- */
+.split {
+  display: grid;
+  gap: clamp(var(--space-xl), 5vw, var(--space-3xl));
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.split--copy-narrow { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+.split--media-narrow{ grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+
+.split[data-flip="true"] > :first-child { order: 2; }
+
+@media (max-width: 899px) {
+  .split,
+  .split--copy-narrow,
+  .split--media-narrow { grid-template-columns: minmax(0, 1fr); }
+  .split[data-flip="true"] > :first-child { order: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   Hairlines
+   -------------------------------------------------------------------------- */
+.rule {
+  border: 0;
+  border-block-start: var(--border-w) solid var(--border-subtle);
+  inline-size: 100%;
+}
+
+.rule--strong { border-block-start-color: var(--border-strong); }
+
+/* The logo's cyan/red/green stack, reduced to a 3px accent rule. */
+.rule--tricolour {
+  block-size: 3px;
+  border: 0;
+  background: var(--motif-tricolour);
+}
+
+/* --------------------------------------------------------------------------
+   Brand motif backgrounds (pure CSS, zero image weight)
+   -------------------------------------------------------------------------- */
+.motif {
+  position: relative;
+  isolation: isolate;
+}
+
+.motif::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--motif-light);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 40%, #000 60%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 40%, #000 60%, transparent);
+  pointer-events: none;
+}
+
+[data-surface="inverse"] .motif::after { background-image: var(--motif-dark); }

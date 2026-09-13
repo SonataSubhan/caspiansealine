@@ -1,0 +1,589 @@
+/* ==========================================================================
+   COMPONENTS — self-contained, surface-agnostic, no outer margins.
+   Each block maps 1:1 to a React component in the Next.js build.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   BUTTON
+   -------------------------------------------------------------------------- */
+.btn {
+  --btn-bg: var(--brand-navy);
+  --btn-fg: var(--neutral-000);
+  --btn-bd: var(--brand-navy);
+  --btn-bg-hover: var(--navy-hover);
+  --btn-bd-hover: var(--navy-hover);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  min-block-size: 2.875rem;          /* 46px — comfortably above the 44px AA target */
+  padding-inline: var(--space-md);
+  border: var(--border-w) solid var(--btn-bd);
+  border-radius: var(--radius-sm);
+  background-color: var(--btn-bg);
+  color: var(--btn-fg);
+  font-size: var(--text-md);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+  letter-spacing: var(--ls-snug);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out);
+}
+
+.btn:hover {
+  background-color: var(--btn-bg-hover);
+  border-color: var(--btn-bd-hover);
+  color: var(--btn-fg);
+}
+
+.btn:active { transform: translateY(1px); }
+
+.btn__icon {
+  inline-size: 0.9em;
+  block-size: 0.9em;
+  flex: none;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.btn:hover .btn__icon { transform: translateX(3px); }
+
+/* Variants */
+.btn--secondary {
+  --btn-bg: transparent;
+  --btn-fg: var(--text-primary);
+  --btn-bd: var(--border-strong);
+  --btn-bg-hover: var(--brand-navy);
+  --btn-bd-hover: var(--brand-navy);
+}
+
+.btn--secondary:hover { color: var(--neutral-000); }
+
+.btn--accent {
+  --btn-bg: var(--brand-cyan);
+  --btn-fg: var(--brand-navy);
+  --btn-bd: var(--brand-cyan);
+  --btn-bg-hover: var(--cyan-hover);
+  --btn-bd-hover: var(--cyan-hover);
+}
+
+.btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--text-primary);
+  --btn-bd: transparent;
+  --btn-bg-hover: var(--neutral-050);
+  --btn-bd-hover: transparent;
+}
+
+/* On the navy surface the primary button inverts automatically. */
+[data-surface="inverse"] .btn:not(.btn--accent):not(.btn--secondary):not(.btn--ghost) {
+  --btn-bg: var(--neutral-000);
+  --btn-fg: var(--brand-navy);
+  --btn-bd: var(--neutral-000);
+  --btn-bg-hover: var(--neutral-100);
+  --btn-bd-hover: var(--neutral-100);
+}
+
+[data-surface="inverse"] .btn--secondary {
+  --btn-bg: transparent;
+  --btn-fg: var(--neutral-000);
+  --btn-bd: var(--border-inverse-s);
+  --btn-bg-hover: var(--neutral-000);
+  --btn-bd-hover: var(--neutral-000);
+}
+
+[data-surface="inverse"] .btn--secondary:hover { color: var(--brand-navy); }
+
+/* Sizes */
+.btn--sm { min-block-size: 2.375rem; padding-inline: var(--space-sm); font-size: var(--text-sm); }
+.btn--lg { min-block-size: 3.375rem; padding-inline: var(--space-lg); font-size: var(--text-base); }
+.btn--block { inline-size: 100%; }
+
+/* --------------------------------------------------------------------------
+   ARROW LINK — the standard inline "read more" affordance
+   -------------------------------------------------------------------------- */
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: var(--text-md);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-snug);
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.link-arrow__icon {
+  inline-size: 0.85em;
+  block-size: 0.85em;
+  flex: none;
+  color: var(--brand-cyan);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.link-arrow:hover { color: var(--link-hover); }
+.link-arrow:hover .link-arrow__icon { transform: translateX(4px); }
+
+/* --------------------------------------------------------------------------
+   CARD — one shape, three content shapes on top of it
+   -------------------------------------------------------------------------- */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  min-inline-size: 0;
+  background-color: var(--surface-raised);
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out),
+              transform var(--dur-base) var(--ease-out);
+}
+
+.card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  flex: 1 1 auto;
+  padding: clamp(var(--space-md), 2.2vw, var(--space-lg));
+}
+
+.card__title { font-size: var(--text-xl); line-height: var(--lh-heading); }
+.card__text  { color: var(--text-secondary); font-size: var(--text-md); }
+.card__foot  { margin-block-start: auto; padding-block-start: var(--space-xs); }
+
+/* An accent hairline on top, coloured per the logo's cyan/red/green stack. */
+.card__accent {
+  block-size: 3px;
+  flex: none;
+  background-color: var(--card-accent, var(--brand-cyan));
+}
+
+.card[data-accent="cyan"]  { --card-accent: var(--brand-cyan); }
+.card[data-accent="red"]   { --card-accent: var(--brand-red); }
+.card[data-accent="green"] { --card-accent: var(--brand-green); }
+
+/* Whole-card link: keep one real <a> and stretch it, so there is exactly one
+   focusable target and the accessible name stays on the heading. */
+.card__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.card__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.card:has(.card__link:hover),
+.card:has(.card__link:focus-visible) {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.card:has(.card__link:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.card:has(.card__link:hover) .link-arrow__icon { transform: translateX(4px); }
+
+/* --------------------------------------------------------------------------
+   MEDIA PLACEHOLDER
+   Real photography is not available yet. Rather than leave a hole or fake an
+   image, every slot renders a labelled brand plate carrying the exact asset
+   spec, so the layout is final and the photo can be dropped in unchanged.
+   -------------------------------------------------------------------------- */
+.media {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: var(--media-ratio, 3 / 2);
+  overflow: hidden;
+  background-color: var(--surface-subtle);
+  border-radius: var(--radius-md);
+}
+
+.media > img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.media--ratio-hero    { --media-ratio: 4 / 3; }
+.media--ratio-wide    { --media-ratio: 16 / 9; }
+.media--ratio-square  { --media-ratio: 1 / 1; }
+.media--ratio-portrait{ --media-ratio: 4 / 5; }
+.media--flush         { border-radius: 0; }
+
+.media-placeholder {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  block-size: 100%;
+  background-color: var(--surface-subtle);
+  background-image: var(--motif-light);
+  border: var(--border-w) dashed var(--border-default);
+  border-radius: inherit;
+  isolation: isolate;
+}
+
+.media-placeholder::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  translate: -50% -50%;
+  inline-size: min(34%, 9rem);
+  aspect-ratio: 1;
+  background-color: var(--brand-navy);
+  opacity: 0.09;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='32.3 28.7 103.0 103.3' role='img' aria-label='Caspian Sea Line'%3E%3Ctitle%3ECaspian Sea Line%3C/title%3E%3Cpath fill='%23000' d='M83.7,28.7c-11.1,0-21.3,3.5-29.7,9.4h59.4C105,32.2,94.8,28.7,83.7,28.7z'/%3E%3Cpath fill='%23000' d='M95,56.9h34.7c-1.7-3.4-3.8-6.5-6.2-9.4H43.9c-2.4,2.9-4.4,6-6.2,9.4h34.7C78.9,51.6,88.5,51.6,95,56.9z'/%3E%3Cpath fill='%23000' d='M133.4,66.3h-29.8c-1.6,0-3.1-0.8-4.1-2.1L99.5,64c-0.9-1.3-2.5-2.1-4.1-2.1H72.1c-1.6,0-3.1,0.8-4.1,2.1 l-0.1,0.2c-0.9,1.3-2.5,2.1-4.1,2.1H34c-0.9,3-1.4,6.2-1.7,9.4h27.9c1.6,0,3.2-0.7,4.3-2l0.4-0.4c1.1-1.3,2.6-2,4.3-2h29.7 c1.4,0,2.6,0.6,3.5,1.6l0.7,0.8c1.1,1.3,2.6,2,4.3,2h27.9C134.9,72.4,134.3,69.3,133.4,66.3z'/%3E%3Cpath fill='%23000' d='M113.9,101.9l-0.4-0.4c-1.1-1.3-2.6-2-4.3-2h-51c-1.7,0-3.2,0.7-4.3,2l-0.4,0.4c-1.1,1.3-2.6,2-4.3,2H37.7 c1.7,3.4,3.8,6.5,6.2,9.4h2c1.5,0,3-0.6,4.1-1.8l0.8-0.9c1.1-1.1,2.5-1.8,4.1-1.8h57.8c1.5,0,3,0.6,4.1,1.8l0.8,0.9 c1.1,1.1,2.5,1.8,4.1,1.8h2c2.4-2.9,4.4-6,6.2-9.4h-11.6C116.5,103.8,114.9,103.1,113.9,101.9z'/%3E%3Cpath fill='%23000' d='M111.4,122.6c-1.2-0.2-2.2-0.8-3-1.9l-0.3-0.4c-0.9-1.3-2.2-2-3.5-2H62.9c-1.3,0-2.6,0.7-3.5,2l-0.3,0.4 c-0.8,1.1-1.9,1.8-3,1.9H54c8.4,5.9,18.6,9.4,29.7,9.4c11.1,0,21.3-3.5,29.7-9.4H111.4z'/%3E%3Cpath fill='%23000' d='M106.8,83.2l-0.6-0.7c-1-1.2-2.4-1.8-3.9-1.8H65.1c-1.5,0-2.9,0.7-3.9,1.8l-0.6,0.7c-1,1.2-2.4,1.8-3.9,1.8 H32.3c0.3,3.2,0.9,6.4,1.7,9.4h19c1.6,0,3-0.6,4.1-1.8l0.8-0.8c1.1-1.1,2.6-1.8,4.1-1.8h43.3c1.6,0,3,0.6,4.1,1.8l0.8,0.8 c1.1,1.1,2.6,1.8,4.1,1.8h19c0.9-3,1.4-6.2,1.7-9.4h-24.5C109.2,85.1,107.8,84.4,106.8,83.2z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='32.3 28.7 103.0 103.3' role='img' aria-label='Caspian Sea Line'%3E%3Ctitle%3ECaspian Sea Line%3C/title%3E%3Cpath fill='%23000' d='M83.7,28.7c-11.1,0-21.3,3.5-29.7,9.4h59.4C105,32.2,94.8,28.7,83.7,28.7z'/%3E%3Cpath fill='%23000' d='M95,56.9h34.7c-1.7-3.4-3.8-6.5-6.2-9.4H43.9c-2.4,2.9-4.4,6-6.2,9.4h34.7C78.9,51.6,88.5,51.6,95,56.9z'/%3E%3Cpath fill='%23000' d='M133.4,66.3h-29.8c-1.6,0-3.1-0.8-4.1-2.1L99.5,64c-0.9-1.3-2.5-2.1-4.1-2.1H72.1c-1.6,0-3.1,0.8-4.1,2.1 l-0.1,0.2c-0.9,1.3-2.5,2.1-4.1,2.1H34c-0.9,3-1.4,6.2-1.7,9.4h27.9c1.6,0,3.2-0.7,4.3-2l0.4-0.4c1.1-1.3,2.6-2,4.3-2h29.7 c1.4,0,2.6,0.6,3.5,1.6l0.7,0.8c1.1,1.3,2.6,2,4.3,2h27.9C134.9,72.4,134.3,69.3,133.4,66.3z'/%3E%3Cpath fill='%23000' d='M113.9,101.9l-0.4-0.4c-1.1-1.3-2.6-2-4.3-2h-51c-1.7,0-3.2,0.7-4.3,2l-0.4,0.4c-1.1,1.3-2.6,2-4.3,2H37.7 c1.7,3.4,3.8,6.5,6.2,9.4h2c1.5,0,3-0.6,4.1-1.8l0.8-0.9c1.1-1.1,2.5-1.8,4.1-1.8h57.8c1.5,0,3,0.6,4.1,1.8l0.8,0.9 c1.1,1.1,2.5,1.8,4.1,1.8h2c2.4-2.9,4.4-6,6.2-9.4h-11.6C116.5,103.8,114.9,103.1,113.9,101.9z'/%3E%3Cpath fill='%23000' d='M111.4,122.6c-1.2-0.2-2.2-0.8-3-1.9l-0.3-0.4c-0.9-1.3-2.2-2-3.5-2H62.9c-1.3,0-2.6,0.7-3.5,2l-0.3,0.4 c-0.8,1.1-1.9,1.8-3,1.9H54c8.4,5.9,18.6,9.4,29.7,9.4c11.1,0,21.3-3.5,29.7-9.4H111.4z'/%3E%3Cpath fill='%23000' d='M106.8,83.2l-0.6-0.7c-1-1.2-2.4-1.8-3.9-1.8H65.1c-1.5,0-2.9,0.7-3.9,1.8l-0.6,0.7c-1,1.2-2.4,1.8-3.9,1.8 H32.3c0.3,3.2,0.9,6.4,1.7,9.4h19c1.6,0,3-0.6,4.1-1.8l0.8-0.8c1.1-1.1,2.6-1.8,4.1-1.8h43.3c1.6,0,3,0.6,4.1,1.8l0.8,0.8 c1.1,1.1,2.6,1.8,4.1,1.8h19c0.9-3,1.4-6.2,1.7-9.4h-24.5C109.2,85.1,107.8,84.4,106.8,83.2z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.card .media-placeholder,
+.b-hero .media-placeholder { border: 0; }
+
+.media-placeholder__label {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  max-inline-size: calc(100% - var(--space-md));
+  gap: var(--space-2xs);
+  padding: var(--space-3xs) var(--space-2xs);
+  background-color: var(--neutral-000);
+  border: var(--border-w) solid var(--border-default);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  overflow-wrap: anywhere;
+}
+
+[data-surface="inverse"] .media-placeholder {
+  background-color: rgba(255, 255, 255, 0.04);
+  background-image: var(--motif-dark);
+  border-color: var(--border-inverse-s);
+}
+
+[data-surface="inverse"] .media-placeholder::before {
+  background-color: var(--neutral-000);
+  opacity: 0.1;
+}
+
+[data-surface="inverse"] .media-placeholder__label {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-inverse-s);
+  color: var(--text-inverse-mute);
+}
+
+/* --------------------------------------------------------------------------
+   BADGE / TAG
+   -------------------------------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-self: start;
+  inline-size: fit-content;
+  align-items: center;
+  gap: var(--space-3xs);
+  padding: 0.3rem var(--space-2xs);
+  border: var(--border-w) solid var(--border-default);
+  border-radius: var(--radius-xs);
+  background-color: transparent;
+  font-size: var(--text-2xs);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--text-secondary);
+}
+
+.badge--cyan  { border-color: var(--brand-cyan);  color: var(--cyan-hover);  background: var(--cyan-soft); }
+.badge--red   { border-color: var(--brand-red);   color: var(--brand-red);   background: var(--red-soft); }
+.badge--green { border-color: var(--brand-green); color: var(--green-hover); background: var(--green-soft); }
+
+[data-surface="inverse"] .badge {
+  border-color: var(--border-inverse-s);
+  color: var(--text-inverse-mute);
+  background: transparent;
+}
+
+/* --------------------------------------------------------------------------
+   STAT
+   -------------------------------------------------------------------------- */
+.stat {
+  display: grid;
+  gap: var(--space-2xs);
+  padding: clamp(var(--space-md), 2.4vw, var(--space-xl));
+}
+
+.stat__value {
+  font-size: var(--text-3xl);
+  font-weight: var(--fw-black);
+  line-height: 1;
+  letter-spacing: var(--ls-tighter);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.stat__unit {
+  font-size: 0.5em;
+  font-weight: var(--fw-bold);
+  margin-inline-start: 0.15em;
+  color: var(--brand-cyan);
+}
+
+.stat__label {
+  font-size: var(--text-sm);
+  line-height: var(--lh-normal);
+  color: var(--text-secondary);
+  max-inline-size: 26ch;
+}
+
+/* --------------------------------------------------------------------------
+   SPEC LIST — key/value rows for vessel data, schedules, contact details
+   -------------------------------------------------------------------------- */
+.spec {
+  container-type: inline-size;
+  display: grid;
+  gap: 0;
+  margin: 0;
+  inline-size: 100%;
+  font-size: var(--text-md);
+}
+
+.spec__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-sm);
+  align-items: baseline;
+  padding-block: var(--space-2xs);
+  border-block-start: var(--border-w) solid var(--border-subtle);
+}
+
+.spec__row:first-child { border-block-start: 0; }
+
+/* In a narrow column — a sidebar panel, a card — a two-up key/value row
+   wraps badly. A container query stacks it instead of guessing at a
+   viewport width the component knows nothing about. */
+@container (max-width: 24rem) {
+  .spec__row { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .spec__value { text-align: start; }
+}
+.spec__key   { color: var(--text-tertiary); }
+.spec__value {
+  font-weight: var(--fw-bold);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums lining-nums;
+  text-align: end;
+}
+
+/* --------------------------------------------------------------------------
+   DATA TABLE — sailing schedules, tariffs, port lists
+   -------------------------------------------------------------------------- */
+.table-scroll {
+  inline-size: 100%;
+  max-inline-size: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.table {
+  inline-size: 100%;
+  min-inline-size: 40rem;
+  font-size: var(--text-md);
+  text-align: start;
+}
+
+.table th,
+.table td {
+  padding: var(--space-sm) var(--space-md);
+  border-block-end: var(--border-w) solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.table thead th {
+  text-align: start;
+  font-size: var(--text-2xs);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  border-block-end-color: var(--border-strong);
+  white-space: nowrap;
+}
+
+.table tbody tr { transition: background-color var(--dur-fast) var(--ease-out); }
+.table tbody tr:hover { background-color: var(--neutral-025); }
+.table td:first-child { font-weight: var(--fw-bold); color: var(--text-primary); }
+.table .is-numeric { font-variant-numeric: tabular-nums lining-nums; text-align: end; }
+
+/* `.table--stack` turns each row into a labelled card below 768px, so a data
+   table never forces a sideways scroll on a phone. Labels come from the
+   data-label attribute, which mirrors the <th> text exactly. */
+@media (max-width: 767px) {
+  .table--stack { min-inline-size: 0; }
+
+  .table--stack thead {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .table--stack tr {
+    position: relative;
+    display: grid;
+    gap: var(--space-3xs);
+    padding-block: var(--space-md);
+    border-block-end: var(--border-w) solid var(--border-subtle);
+  }
+
+  .table--stack td {
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    gap: var(--space-sm);
+    padding: 0;
+    border: 0;
+    text-align: start;
+  }
+
+  .table--stack td::before {
+    content: attr(data-label);
+    font-size: var(--text-2xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    padding-block-start: 0.15em;
+  }
+
+  .table--stack td.is-numeric { text-align: start; }
+
+  /* The row action gains a visible label instead of a bare arrow. */
+  .table--stack .table__action { display: block; padding-block-start: var(--space-2xs); }
+  .table--stack .table__action::before { content: none; }
+}
+
+/* The arrow alone is enough beside a full table row; on the stacked mobile
+   layout the link needs a visible label, which the aria-label also contains. */
+.table__action-text { display: none; }
+
+.table__action .link-arrow {
+  min-block-size: 1.5rem;
+  min-inline-size: 1.5rem;
+  justify-content: flex-end;
+}
+
+@media (max-width: 767px) {
+  .table__action-text { display: inline; }
+}
+
+/* --------------------------------------------------------------------------
+   FORM CONTROLS
+   -------------------------------------------------------------------------- */
+.field { display: grid; gap: var(--space-3xs); }
+
+.field__label {
+  font-size: var(--text-sm);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-snug);
+  color: var(--text-primary);
+}
+
+.field__hint { font-size: var(--text-xs); color: var(--text-tertiary); }
+
+.input,
+.select,
+.textarea {
+  inline-size: 100%;
+  /* A date or number input carries an intrinsic minimum width that can push
+     past a narrow column; these two lines stop that at any viewport. */
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  min-block-size: 2.875rem;
+  padding: var(--space-2xs) var(--space-sm);
+  background-color: var(--surface-raised);
+  border: var(--border-w) solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: var(--text-md);
+  transition: border-color var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.textarea { min-block-size: 8rem; padding-block: var(--space-xs); resize: vertical; }
+
+.input::placeholder,
+.textarea::placeholder { color: var(--neutral-400); }
+
+.input:hover,
+.select:hover,
+.textarea:hover { border-color: var(--border-strong); }
+
+.input:focus-visible,
+.select:focus-visible,
+.textarea:focus-visible {
+  outline: none;
+  border-color: var(--brand-cyan);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-cyan) 22%, transparent);
+}
+
+.select {
+  appearance: none;
+  padding-inline-end: var(--space-xl);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%235f7288' d='M1.4 0 6 4.6 10.6 0 12 1.4 6 7.4 0 1.4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-sm) center;
+  background-size: 0.7rem;
+}
+
+/* --------------------------------------------------------------------------
+   BREADCRUMB
+   -------------------------------------------------------------------------- */
+.breadcrumb { font-size: var(--text-sm); color: var(--text-tertiary); }
+.breadcrumb ol { display: flex; flex-wrap: wrap; gap: var(--space-2xs); list-style: none; padding: 0; }
+.breadcrumb li + li::before { content: "/"; margin-inline-end: var(--space-2xs); color: var(--neutral-300); }
+/* Padding, not font-size, lifts these to the 24px minimum target. */
+.breadcrumb a {
+  display: inline-block;
+  padding-block: var(--space-3xs);
+  text-decoration: none;
+}
+
+/* --------------------------------------------------------------------------
+   LOGO
+   -------------------------------------------------------------------------- */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  color: var(--brand-navy);
+  text-decoration: none;
+  flex: none;
+}
+
+.logo__mark {
+  inline-size: auto;
+  block-size: var(--logo-h, 2.125rem);
+  color: currentColor;
+  transition: block-size var(--dur-base) var(--ease-out);
+}
+
+[data-surface="inverse"] .logo { color: var(--neutral-000); }

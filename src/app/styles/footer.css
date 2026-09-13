@@ -1,0 +1,135 @@
+/* ==========================================================================
+   SITE FOOTER
+   ========================================================================== */
+
+.site-footer {
+  background-color: var(--brand-navy);
+  color: var(--text-inverse-mute);
+}
+
+/* --- Pre-footer contact strip ------------------------------------------- */
+.footer-cta {
+  border-block-end: var(--border-w) solid var(--border-inverse);
+}
+
+.footer-cta__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg) var(--space-2xl);
+  padding-block: clamp(var(--space-xl), 4vw, var(--space-2xl));
+}
+
+.footer-cta__title {
+  font-size: var(--text-2xl);
+  font-weight: var(--fw-black);
+  letter-spacing: var(--ls-tight);
+  color: var(--neutral-000);
+  max-inline-size: 22ch;
+}
+
+/* --- Link columns -------------------------------------------------------- */
+.footer-main__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) repeat(4, minmax(0, 1fr));
+  gap: clamp(var(--space-lg), 3vw, var(--space-2xl));
+  padding-block: clamp(var(--space-2xl), 5vw, var(--space-3xl));
+}
+
+@media (max-width: 1099px) {
+  .footer-main__inner { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .footer-brand { grid-column: 1 / -1; }
+}
+
+@media (max-width: 599px) {
+  .footer-main__inner { grid-template-columns: minmax(0, 1fr); }
+}
+
+.footer-brand {
+  display: grid;
+  gap: var(--space-md);
+  align-content: start;
+  max-inline-size: 32ch;
+}
+
+.footer-brand .logo { --logo-h: 2.5rem; }
+
+.footer-col__title {
+  font-size: var(--text-2xs);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--neutral-000);
+  padding-block-end: var(--space-2xs);
+  margin-block-end: var(--space-xs);
+  border-block-end: var(--border-w) solid var(--border-inverse);
+}
+
+.footer-col__list { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-3xs); }
+
+.footer-col__list a {
+  display: inline-block;
+  padding-block: 0.2rem;
+  font-size: var(--text-md);
+  color: var(--text-inverse-mute);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.footer-col__list a:hover { color: var(--neutral-000); }
+
+/* --- Contact block ------------------------------------------------------- */
+.footer-contact { display: grid; gap: var(--space-2xs); font-size: var(--text-md); font-style: normal; }
+.footer-contact a { color: var(--neutral-000); text-decoration: none; font-weight: var(--fw-bold); }
+.footer-contact a:hover { color: var(--brand-cyan); }
+
+/* --- Socials ------------------------------------------------------------- */
+.social { display: flex; gap: var(--space-2xs); }
+
+.social a {
+  display: grid;
+  place-items: center;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  border: var(--border-w) solid var(--border-inverse);
+  border-radius: var(--radius-sm);
+  color: var(--text-inverse-mute);
+  transition: background-color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out);
+}
+
+.social a:hover {
+  background-color: var(--neutral-000);
+  border-color: var(--neutral-000);
+  color: var(--brand-navy);
+}
+
+.social svg { inline-size: 1.05rem; block-size: 1.05rem; }
+
+/* --- Legal bar ----------------------------------------------------------- */
+.footer-legal {
+  border-block-start: var(--border-w) solid var(--border-inverse);
+  font-size: var(--text-sm);
+}
+
+.footer-legal__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm) var(--space-lg);
+  padding-block: var(--space-md);
+}
+
+.footer-legal__links { display: flex; flex-wrap: wrap; gap: 0 var(--space-md); list-style: none; padding: 0; margin: 0; }
+
+/* Padding rather than font-size keeps these above the 24px target size. */
+.footer-legal a {
+  display: inline-block;
+  padding-block: var(--space-2xs);
+  color: var(--text-inverse-mute);
+  text-decoration: none;
+}
+.footer-legal a:hover { color: var(--neutral-000); }

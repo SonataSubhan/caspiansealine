@@ -1,26 +1,75 @@
+/* ==========================================================================
+   GLOBAL STYLESHEET — the single CSS entry point for the whole site.
+
+   Load order is the cascade contract. Do NOT reorder these imports, and do not
+   let an import-sorting formatter touch this file.
+
+     tailwindcss  → theme + preflight + utilities scaffolding
+     tokens       → every design decision, as custom properties (unlayered)
+     reset/base   → layer(base)        element defaults, typography
+     layout       → layer(components)  container, section, grid, split
+     components   → layer(components)  button, card, media, table, field …
+     header/footer→ layer(components)  site chrome
+     blocks       → layer(components)  page-level sections
+     utilities    → layer(utilities)   the small closed utility set
+
+   Everything below `tokens` is layered, so a Tailwind utility can still win
+   over a component class when a genuine one-off is needed.
+
+   The partials live in ./styles rather than ../styles on purpose: Tailwind's
+   CSS resolver fails to follow a `..` traversal on Windows, so every import
+   here stays inside this directory.
+   ========================================================================== */
+
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import "./styles/tokens.css";
+@import "./styles/reset.css" layer(base);
+@import "./styles/base.css" layer(base);
+@import "./styles/layout.css" layer(components);
+@import "./styles/components.css" layer(components);
+@import "./styles/header.css" layer(components);
+@import "./styles/footer.css" layer(components);
+@import "./styles/blocks.css" layer(components);
+@import "./styles/utilities.css" layer(utilities);
 
+/* --------------------------------------------------------------------------
+   Bridge the design tokens into Tailwind's namespace.
+
+   `@theme inline` means Tailwind emits utilities that reference our variables
+   rather than copying their values, so `bg-navy` and `background: var(--brand-navy)`
+   can never drift apart. tokens.css stays the single source of truth.
+   -------------------------------------------------------------------------- */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-navy: var(--brand-navy);
+  --color-cyan: var(--brand-cyan);
+  --color-signal-red: var(--brand-red);
+  --color-signal-green: var(--brand-green);
+  --color-fog: var(--neutral-050);
+  --color-ink: var(--text-primary);
+  --color-muted: var(--text-secondary);
+  --color-line: var(--border-subtle);
+
+  --font-sans: var(--font-mulish), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 900px;
+  --breakpoint-xl: 1100px;
+  --breakpoint-2xl: 1280px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* next/font injects `--font-mulish` on <html>; tokens.css consumes it here so
+   nothing else in the stylesheet has to know where the font came from. */
+:root {
+  --font-sans: var(--font-mulish), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }

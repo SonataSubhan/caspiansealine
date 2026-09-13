@@ -1,0 +1,511 @@
+/* ==========================================================================
+   HOME — page-level blocks.
+   Each `.b-*` block is a page section and becomes one React component.
+   Blocks compose layout + components; they never re-declare brand values.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   b-hero
+   -------------------------------------------------------------------------- */
+/* The media occupies the right half of the viewport and is positioned rather
+   than placed in the grid, so the copy column can share the page container
+   exactly — the h1 starts on the same vertical line as every section below.
+   No viewport-unit maths, therefore no scrollbar drift and no side scroll. */
+.b-hero {
+  position: relative;
+  background-color: var(--brand-navy);
+  overflow: hidden;
+}
+
+.b-hero__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  min-block-size: clamp(30rem, 66vh, 42rem);
+  padding-block: clamp(var(--space-2xl), 7vw, var(--space-4xl));
+}
+
+.b-hero__copy {
+  display: grid;
+  gap: var(--space-md);
+  justify-items: start;
+  inline-size: 100%;
+  max-inline-size: min(34rem, 100%);
+}
+
+.b-hero__title { color: var(--neutral-000); }
+.b-hero__title em { font-style: normal; color: var(--brand-cyan); }
+.b-hero__lead { color: var(--text-inverse-mute); max-inline-size: 44ch; }
+.b-hero__actions { margin-block-start: var(--space-2xs); }
+
+@media (max-width: 479px) {
+  .b-hero__actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    inline-size: 100%;
+  }
+}
+
+.b-hero__media {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  inline-size: 50%;
+  z-index: 0;
+}
+
+.b-hero__media .media-placeholder {
+  block-size: 100%;
+  border: 0;
+  border-radius: 0;
+}
+
+/* Strata motif over the navy, fading out before it reaches the media. */
+.b-hero::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 50%;
+  z-index: 0;
+  background-image: var(--motif-dark);
+  -webkit-mask-image: linear-gradient(to right, #000, transparent 85%);
+  mask-image: linear-gradient(to right, #000, transparent 85%);
+  pointer-events: none;
+}
+
+@media (max-width: 899px) {
+  .b-hero__inner {
+    min-block-size: 0;
+    padding-block: clamp(var(--space-2xl), 10vw, var(--space-3xl));
+  }
+  .b-hero__copy { max-inline-size: none; }
+  .b-hero__media {
+    position: relative;
+    inline-size: 100%;
+    block-size: clamp(14rem, 50vw, 22rem);
+  }
+  .b-hero::before { inline-size: 100%; }
+}
+
+/* --------------------------------------------------------------------------
+   b-pagehero — the inner-page header. One entry rhythm for the whole site.
+   -------------------------------------------------------------------------- */
+.b-pagehero {
+  position: relative;
+  background-color: var(--brand-navy);
+  overflow: hidden;
+}
+
+.b-pagehero__inner {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-md);
+  padding-block: clamp(var(--space-2xl), 6vw, var(--space-4xl));
+  max-inline-size: calc(var(--content-max) + var(--gutter) * 2);
+}
+
+.b-pagehero .breadcrumb { color: var(--text-inverse-mute); }
+.b-pagehero .breadcrumb li + li::before { color: rgba(255, 255, 255, 0.35); }
+.b-pagehero__title { color: var(--neutral-000); max-inline-size: 22ch; }
+.b-pagehero__lead { color: var(--text-inverse-mute); max-inline-size: 56ch; }
+
+/* --------------------------------------------------------------------------
+   b-quickbar — sits flush under the hero, full-bleed, four equal cells
+   -------------------------------------------------------------------------- */
+.b-quickbar {
+  background-color: var(--neutral-000);
+  border-block-end: var(--border-w) solid var(--border-subtle);
+}
+
+.b-quickbar__grid { border-block-start: 0; }
+
+.quick-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) clamp(var(--space-md), 2vw, var(--space-lg));
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.quick-tile:hover { background-color: var(--neutral-025); color: var(--text-primary); }
+
+.quick-tile__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  flex: none;
+  border: var(--border-w) solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--brand-navy);
+  transition: border-color var(--dur-fast) var(--ease-out),
+              background-color var(--dur-fast) var(--ease-out);
+}
+
+.quick-tile:hover .quick-tile__icon {
+  border-color: var(--brand-cyan);
+  background-color: var(--cyan-soft);
+}
+
+.quick-tile__icon svg { inline-size: 1.15rem; block-size: 1.15rem; }
+.quick-tile__text { display: grid; gap: 0.1rem; min-inline-size: 0; }
+.quick-tile__title { font-size: var(--text-md); font-weight: var(--fw-bold); letter-spacing: var(--ls-snug); }
+.quick-tile__sub { font-size: var(--text-xs); color: var(--text-tertiary); }
+
+.quick-tile__arrow {
+  margin-inline-start: auto;
+  inline-size: 0.85rem;
+  block-size: 0.85rem;
+  flex: none;
+  color: var(--neutral-300);
+  transition: transform var(--dur-base) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.quick-tile:hover .quick-tile__arrow { transform: translateX(3px); color: var(--brand-cyan); }
+
+/* --------------------------------------------------------------------------
+   b-intro — positioning statement + proof numbers
+   -------------------------------------------------------------------------- */
+.b-intro__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(var(--space-xl), 5vw, var(--space-3xl));
+  align-items: start;
+}
+
+@media (max-width: 899px) {
+  .b-intro__grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.b-intro__statement {
+  font-size: var(--text-xl);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-normal);
+  letter-spacing: var(--ls-snug);
+  color: var(--text-primary);
+}
+
+.b-intro__stats { margin-block-start: clamp(var(--space-xl), 4vw, var(--space-2xl)); }
+
+/* --------------------------------------------------------------------------
+   b-services
+   -------------------------------------------------------------------------- */
+.service-card__index {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--ls-wide);
+  color: var(--text-tertiary);
+}
+
+.service-card__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-3xs);
+  font-size: var(--text-md);
+  color: var(--text-secondary);
+}
+
+.service-card__list li {
+  display: flex;
+  gap: var(--space-2xs);
+  align-items: baseline;
+}
+
+.service-card__list li::before {
+  content: "";
+  inline-size: 0.5rem;
+  block-size: var(--border-w-thick);
+  flex: none;
+  translate: 0 -0.25em;
+  background-color: var(--card-accent, var(--brand-cyan));
+}
+
+/* --------------------------------------------------------------------------
+   b-network — trade lanes as a schedule table
+   -------------------------------------------------------------------------- */
+.lane-flag {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-2xs);
+  font-weight: var(--fw-bold);
+}
+
+.lane-flag::before {
+  content: "";
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  flex: none;
+  margin-block-start: 0.45em;
+  border-radius: var(--radius-full);
+  background-color: var(--brand-cyan);
+}
+
+.b-network__ports {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-sm);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.b-network__ports li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: var(--text-md);
+  color: var(--text-secondary);
+}
+
+.b-network__ports li + li::before {
+  content: "";
+  inline-size: 3px;
+  block-size: 3px;
+  border-radius: var(--radius-full);
+  background-color: var(--neutral-300);
+}
+
+/* --------------------------------------------------------------------------
+   b-fleet
+   -------------------------------------------------------------------------- */
+.vessel-card .media { --media-ratio: 16 / 10; }
+.vessel-card__spec { margin-block-start: var(--space-2xs); }
+
+/* --------------------------------------------------------------------------
+   b-sustainability
+   -------------------------------------------------------------------------- */
+.b-sustain { position: relative; overflow: hidden; }
+.b-sustain .split { align-items: start; }
+.b-sustain .eyebrow::before { background: var(--brand-green); }
+
+.b-sustain__targets {
+  display: grid;
+  gap: var(--border-w);
+  background-color: var(--border-inverse);
+  border: var(--border-w) solid var(--border-inverse);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 767px) {
+  .b-sustain__targets { grid-template-columns: minmax(0, 1fr); }
+}
+
+.b-sustain__target {
+  background-color: var(--brand-navy);
+  padding: var(--space-md);
+  display: grid;
+  gap: var(--space-3xs);
+}
+
+.b-sustain__target dt {
+  font-size: var(--text-2xl);
+  font-weight: var(--fw-black);
+  line-height: 1;
+  color: var(--neutral-000);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.b-sustain__target dd { margin: 0; font-size: var(--text-sm); color: var(--text-inverse-mute); }
+
+/* --------------------------------------------------------------------------
+   b-capabilities — bordered feature grid
+   -------------------------------------------------------------------------- */
+.capability {
+  display: grid;
+  gap: var(--space-2xs);
+  padding: clamp(var(--space-md), 2.4vw, var(--space-xl));
+}
+
+.capability__icon {
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  color: var(--brand-cyan);
+  margin-block-end: var(--space-2xs);
+}
+
+.capability__title { font-size: var(--text-lg); font-weight: var(--fw-bold); letter-spacing: var(--ls-snug); }
+.capability__title a {
+  display: inline-block;
+  padding-block: 2px;
+  text-decoration: none;
+}
+.capability__title a:hover { color: var(--link-hover); }
+.capability__text { font-size: var(--text-md); color: var(--text-secondary); }
+
+/* --------------------------------------------------------------------------
+   b-news
+   -------------------------------------------------------------------------- */
+.news-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: var(--text-xs);
+  letter-spacing: var(--ls-snug);
+  color: var(--text-tertiary);
+}
+
+.news-card__meta time { font-variant-numeric: tabular-nums lining-nums; }
+.news-card .media { --media-ratio: 16 / 9; }
+.news-card__title { font-size: var(--text-lg); line-height: var(--lh-heading); }
+
+/* --------------------------------------------------------------------------
+   b-cta — closing band
+   -------------------------------------------------------------------------- */
+.b-cta { position: relative; overflow: hidden; }
+
+.b-cta__inner {
+  display: grid;
+  gap: var(--space-lg);
+  justify-items: center;
+  text-align: center;
+  padding-block: clamp(var(--space-2xl), 6vw, var(--space-4xl));
+  max-inline-size: 46rem;
+  margin-inline: auto;
+}
+
+.b-cta__title { color: var(--neutral-000); }
+.b-cta__lead { color: var(--text-inverse-mute); max-inline-size: 52ch; }
+
+/* --------------------------------------------------------------------------
+   Small block helpers
+   -------------------------------------------------------------------------- */
+.b-intro__facts { inline-size: 100%; max-inline-size: 26rem; }
+.b-network__footer { margin-block-start: clamp(var(--space-lg), 3vw, var(--space-xl)); }
+.b-sustain__panel { inline-size: 100%; }
+.b-sustain__panel .media { inline-size: 100%; }
+
+/* --------------------------------------------------------------------------
+   Inner-page compositions built from the same primitives
+   -------------------------------------------------------------------------- */
+.b-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+  gap: clamp(var(--space-xl), 5vw, var(--space-3xl));
+  align-items: start;
+}
+
+@media (max-width: 899px) {
+  .b-detail { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* A bordered aside that carries facts, contacts or next steps. */
+.panel {
+  display: grid;
+  gap: var(--space-md);
+  padding: clamp(var(--space-md), 2.4vw, var(--space-lg));
+  background-color: var(--surface-subtle);
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  align-content: start;
+}
+
+.panel--sticky { position: sticky; inset-block-start: calc(var(--header-main-h) + var(--space-md)); }
+.panel__title { font-size: var(--text-lg); font-weight: var(--fw-bold); letter-spacing: var(--ls-snug); }
+
+@media (max-width: 899px) {
+  .panel--sticky { position: static; }
+}
+
+/* Checklist — the "what's included" list on a service page. */
+.checklist { display: grid; gap: var(--space-2xs); list-style: none; padding: 0; margin: 0; inline-size: 100%; }
+
+.checklist li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-2xs);
+  align-items: baseline;
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+}
+
+.checklist li::before {
+  content: "";
+  inline-size: 0.75rem;
+  block-size: var(--border-w-thick);
+  translate: 0 -0.25em;
+  background-color: var(--brand-cyan);
+}
+
+/* Numbered steps — the quote page's "what happens next". */
+.steps { counter-reset: step; display: grid; gap: var(--space-md); list-style: none; padding: 0; margin: 0; inline-size: 100%; }
+
+.steps li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-sm);
+  align-items: start;
+  font-size: var(--text-md);
+  color: var(--text-secondary);
+}
+
+.steps li::before {
+  content: counter(step, decimal-leading-zero);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-bold);
+  color: var(--brand-cyan);
+  padding-block-start: 0.25em;
+}
+
+/* A short list of links rendered as hairline rows. */
+.link-rows { display: grid; inline-size: 100%; border-block-start: var(--border-w) solid var(--border-subtle); }
+
+.link-rows a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-block: var(--space-sm);
+  border-block-end: var(--border-w) solid var(--border-subtle);
+  font-weight: var(--fw-bold);
+  text-decoration: none;
+  transition: padding-inline-start var(--dur-fast) var(--ease-out);
+}
+
+.link-rows a:hover { padding-inline-start: var(--space-2xs); }
+.link-rows svg { inline-size: 0.9rem; block-size: 0.9rem; flex: none; color: var(--brand-cyan); }
+
+/* Notice — for content the client still has to supply or approve. */
+.notice {
+  display: grid;
+  inline-size: 100%;
+  gap: var(--space-2xs);
+  padding: var(--space-md);
+  border: var(--border-w) solid var(--border-default);
+  border-inline-start: 3px solid var(--brand-red);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-subtle);
+  font-size: var(--text-md);
+  color: var(--text-secondary);
+}
+
+.notice__title {
+  font-size: var(--text-2xs);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--brand-red);
+}
+
+/* Form layout */
+.form-grid {
+  display: grid;
+  gap: var(--space-md);
+  align-items: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.form-grid > .is-full { grid-column: 1 / -1; }
+
+@media (max-width: 599px) {
+  .form-grid { grid-template-columns: minmax(0, 1fr); }
+}
