@@ -6,12 +6,44 @@
  * before launch. See prototype/CONTENT-TODO.md for the full checklist.
  */
 
+/**
+ * The origin every absolute URL on the site is built from: the canonical link,
+ * `og:image`, the sitemap and the JSON-LD `@id`s.
+ *
+ * This must be the domain the site is ACTUALLY served from. A share card is
+ * fetched by WhatsApp, Telegram or LinkedIn from the absolute URL in
+ * `og:image` — point that at a domain that is not serving the site and the
+ * card silently disappears, leaving only the title and description. That is
+ * exactly what happened while this was hard-coded to the .com before the
+ * domain was live.
+ *
+ * Resolution order:
+ *   1. `NEXT_PUBLIC_SITE_URL` — set this in Vercel → Settings → Environment
+ *      Variables the moment the real domain is live. It wins over everything.
+ *   2. `VERCEL_PROJECT_PRODUCTION_URL` — the project's production domain,
+ *      injected by Vercel at build time. It becomes the custom domain by
+ *      itself once one is attached, and it stays the production domain on
+ *      preview deployments, which is what a canonical should point at.
+ *   3. The current production domain, for local builds.
+ */
+function resolveSiteUrl() {
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
+  if (explicit) return explicit.replace(/\/+$/, "");
+
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (vercel) return `https://${vercel}`;
+
+  // TODO(content): replace with https://www.caspiansealine.com once that
+  // domain is attached — or just set NEXT_PUBLIC_SITE_URL and leave this.
+  return "https://caspiansealine.vercel.app";
+}
+
 export const site = {
   name: "Caspian Sea Line",
   legalName: "Caspian Sea Line", // TODO(content): exact registered name
   descriptor: "Shipping company",
   locale: "en",
-  url: "https://www.caspiansealine.com", // TODO(content): confirm production domain
+  url: resolveSiteUrl(),
 
   tagline: "Trans-Caspian shipping & logistics",
   summary:

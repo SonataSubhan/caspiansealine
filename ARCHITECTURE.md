@@ -146,6 +146,14 @@ Russian:
   Twitter card and robots directives from three inputs. A page cannot ship without a
   canonical because the builder always sets one.
 - `metadataBase` is declared once in the root layout; every other URL is relative.
+- **The origin comes from the environment**, resolved once in `content/en/site.js`:
+  `NEXT_PUBLIC_SITE_URL` → `VERCEL_PROJECT_PRODUCTION_URL` → the current production
+  domain. It must match the domain the site is actually served from, because `og:image`
+  is absolute: a card hosted on a domain that does not resolve is silently dropped by
+  WhatsApp and every other scraper, leaving a link with a title and no picture. That is
+  the failure that shipped when the origin was hard-coded to a domain not yet live.
+  When the real domain goes live, set `NEXT_PUBLIC_SITE_URL` in Vercel — nothing else
+  changes.
 - Structured data: `Organization` + `WebSite` once in the layout, then `WebPage`,
   `BreadcrumbList`, `Service` and `NewsArticle` per page, all in one `@graph` and all
   referencing the organisation by `@id` rather than redeclaring it.
