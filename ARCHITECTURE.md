@@ -41,7 +41,7 @@ src/
 │   ├── fonts/*.woff2        Self-hosted variable font (latin + latin-ext)
 │   ├── styles/*.css         The stylesheet partials, colocated with globals.css:
 │   │                        tokens · reset · base · layout · components ·
-│   │                        header · footer · blocks · utilities
+│   │                        header · footer · blocks · motion · utilities
 │   ├── icon.svg             Favicon (SVG)
 │   ├── favicon.ico          Favicon (legacy, multi-size)
 │   ├── apple-icon.png       180×180
@@ -61,6 +61,7 @@ src/
 │   ├── layout/              Container, Section, SectionHead, Grid, RuleGrid, Split,
 │   │                        Stack, Cluster, Prose
 │   ├── navigation/          SiteHeader, MobileDrawer, SiteFooter, Breadcrumb, SkipLink
+│   ├── motion/              RevealController, PageTransition, motionBootScript
 │   └── blocks/              Page sections: Hero, QuickBar, Intro, ServicePillars,
 │                            NetworkPreview, LaneTable, FleetGrid, Capabilities,
 │                            SustainabilityBand, NewsGrid, CtaBand, PageHero, EnquiryForm
@@ -93,6 +94,8 @@ src/
 | Add a port | one entry in `network.js` — the page, the sitemap and the nav follow |
 | Publish a news article | one entry in `news.js` |
 | Change the brand colour, type scale, spacing or radius | `src/app/styles/tokens.css` |
+| Make the animations faster, slower, longer or shorter | the `--motion-*` tokens in `src/app/styles/tokens.css` |
+| Turn all motion off | delete the three files listed in §8 |
 | Make the whole site denser or airier | `--section-y` in `src/app/styles/tokens.css` |
 | Add a nav item | `content/en/navigation.js` — header, drawer and footer all update |
 | Change the site-wide title pattern | `title.template` in `app/layout.js` |
@@ -111,8 +114,10 @@ request-time dependency and it must be fixed rather than accepted.
   the `dynamic` / `revalidate` segment configs.
 - `dynamicParams = false` on every `[slug]` route: an unknown slug 404s instead of being
   rendered on demand.
-- Only three components are client-side: `SiteHeader`, `MobileDrawer` and `EnquiryForm`.
-  Everything else is a Server Component and ships no JavaScript.
+- Only five components are client-side: `SiteHeader`, `MobileDrawer`, `EnquiryForm`,
+  `RevealController` and `PageTransition`. The last two render nothing of their own —
+  pages arrive as `children`, already rendered on the server — so no page is converted
+  to client rendering by them.
 - The CSP is header-based, not nonce-based, precisely because a nonce would force every
   page into dynamic rendering.
 
@@ -161,7 +166,110 @@ Russian:
 
 ---
 
-## 8. Accessibility
+## 8. Motion
+
+Three files, and nothing else on the site knows they exist:
+
+| File | Job |
+|---|---|
+| `src/app/styles/motion.css` | every duration, distance and curve — *how* things move |
+| `src/components/motion/RevealController.jsx` | two IntersectionObservers — *when* a reveal fires |
+| `src/components/motion/PageTransition.jsx` | `<ViewTransition>` around `<main>` — the route cross-fade |
+
+Delete all three and the site is identical, just static.
+
+**Timed, not scrubbed.** The first version used CSS scroll-driven animations
+(`animation-timeline: view()`). They are elegant and need no JavaScript, but
+they *scrub*: progress is bound to scroll position rather than to time, so
+`animation-duration` is ignored, the reveal is finished before the reader's eye
+arrives, and it un-plays on the way back up. Firefox skipped them entirely. The
+observers are about a kilobyte together, play each reveal at a controllable
+speed, and behave the same in every engine.
+
+**A reveal replays.** One observer adds `data-revealed` when an element reaches
+the viewport, 10% short of the bottom edge so it animates where the eye is; a
+second removes it again, but only once the element is *completely* off screen.
+The 10% gap between the two margins is a dead zone, which is what stops an
+element parked at the boundary from flickering. Re-hiding is instantaneous —
+the CSS transition is declared on the revealed state, not on both, so it is
+read only when entering that state — and it happens out of sight, so scrolling
+back up never shows anything fading out. A container that holds reveal targets
+is revealed once and then left alone entirely.
+
+**The fallback is the finished state.** Nothing is hidden unless
+`html[data-motion="on"]` is present, and only the inline boot script
+(`motionBootScript.js`, run before first paint) sets it — and only when
+`IntersectionObserver` exists and the reader has not asked for reduced motion.
+No JavaScript, a blocked bundle, an old engine, a crawler: the attribute is
+absent and the page renders finished. A 2.5s failsafe in that script removes it
+again if React never mounts. Content cannot get stuck invisible, and
+`opacity: 0` keeps an element in the DOM and the accessibility tree, so there is
+no SEO or screen-reader cost either way.
+
+What moves, and by how much:
+
+| Where | What | Duration | Distance |
+|---|---|---|---|
+| Hero / page header | 4-step staggered fade-up on load | 860ms, 110ms apart | 16–26px |
+| Hero photograph | opacity + 4.5% scale settle | 1200ms | — |
+| Section children, split columns, cards | fade-up every time they arrive on screen | 720ms | 16–26px |
+| Siblings in a row | the same, 90ms apart, capped at 6 | — | — |
+| Route change | old page out, new page in with a lift | 180ms + 520ms | 14px |
+| Card photograph on hover | 2.5% scale | 400ms | — |
+
+The lift is `clamp(16px, 0.75rem + 1.2vw, 26px)` — one token, no media query, so
+travel scales with the viewport like the type and space scales do. Easing for
+reveals is expo-out (`--ease-reveal`): nearly all the distance is covered in the
+first third and it glides to a stop, which is what lets a 720ms move read as
+calm rather than slow. UI transitions keep the shorter quart curve and stay
+under 320ms; reveals are content, not UI, and are deliberately exempt.
+
+Two rules keep it from turning into noise. **`opacity` and `translate` only** —
+the two properties the compositor animates without touching layout; and a
+revealed element carries no `translate` at all rather than `translate: 0`, which
+would leave a transform behind and quietly break `position: sticky` on the
+sidebars. **Nothing animates twice**: the controller marks any container that
+holds reveal targets as already revealed, so a grid stays put while its cards
+cascade. Hairline grids (`.rule-grid`, the quick bar) arrive as one piece,
+because they draw their rules with a background the cells cover — hiding the
+cells individually leaves a grey plate that reads as a skeleton loader.
+
+**Page transitions.** `<ViewTransition key={pathname} name="page">` wraps
+`<main>` in the root layout. The key is what makes it a transition: a layout
+persists across navigations, so without a changing key neither enter nor exit
+would ever fire. Header, footer and page background sit outside it and swap
+instantly — identical on both pages, so the swap is invisible and gives the
+reader a fixed frame. `::view-transition { pointer-events: none }` keeps clicks
+alive mid-transition, and the group animation is pinned off so the old page's
+height is never animated into the new one's. React ships this in the App
+Router's own React build; no config, no dependency. A browser without the View
+Transitions API navigates normally with no animation and no error.
+
+Reduced motion is respected twice over: the boot script never turns reveals on,
+the hero entrance falls back to a cross-fade rather than a frozen page, and
+every `::view-transition-*` duration collapses to zero. There is deliberately no
+blanket `animation-duration: 1ms !important` in the reset — that sledgehammer
+would also kill the considered reduced-motion path.
+
+Deliberately absent: parallax, scroll hijacking, pinned sections, counting
+number tickers, letter-by-letter text splitting, animated blur. Each is a
+recognisable sign that motion was added for its own sake.
+
+> `<html>` carries `suppressHydrationWarning`, and it is the only element on the
+> site that does. The boot script writes `data-motion` onto it before React
+> hydrates, so the server HTML and the client DOM legitimately differ by that
+> one attribute. The flag is shallow — it covers `<html>`'s own attributes and
+> nothing inside it — so it hides no other mismatch.
+
+> The reveal target list appears in both `motion.css` and `RevealController.jsx`
+> — the stylesheet hides them, the controller un-hides them. It is the one piece
+> of duplication in the motion system; change one, change the other. It is
+> written at the level of a section's top-level children rather than per block,
+> so a new block on a new page animates without either file being touched.
+
+---
+
+## 9. Accessibility
 
 Built in, not retrofitted: skip link, visible focus ring on every interactive element,
 `aria-expanded` on every disclosure, a real focus trap and Escape handling in the drawer,
@@ -175,7 +283,7 @@ image without `alt`, no link or button without an accessible name, no duplicate 
 
 ---
 
-## 9. Known gaps
+## 10. Known gaps
 
 These are deliberate, not oversights:
 

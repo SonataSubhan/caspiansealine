@@ -1,0 +1,266 @@
+/* ==========================================================================
+   MOTION
+
+   Every animation on this site lives in this file. Delete it and the site is
+   identical, just static — nothing else depends on it.
+
+   Three rules it follows:
+
+   1. TIMED, NOT SCRUBBED. Reveals are driven by an IntersectionObserver
+      (`components/motion/RevealController.jsx`), which adds `data-revealed`
+      when an element arrives and removes it again once the element is
+      completely off screen, so the reveal plays every time it is scrolled
+      back to. The earlier version of this file used CSS
+      scroll-driven animations (`animation-timeline: view()`); they need no
+      JavaScript, but they bind progress to scroll position rather than to
+      time — `animation-duration` is ignored — so the reveal was always over
+      before the reader's eye arrived, and it un-played on the way back up.
+      A timed transition can be given a real speed, plays once, and works in
+      Firefox, which skipped the scroll-driven version entirely.
+
+   2. THE FALLBACK IS THE FINISHED STATE. Nothing is hidden unless
+      `html[data-motion="on"]` is present, and only the inline boot script
+      sets it — before first paint, and only when IntersectionObserver exists
+      and the reader has not asked for reduced motion. No JavaScript, a failed
+      bundle, an old engine, a crawler: the attribute is absent and the page
+      renders finished. A 2.5s failsafe in the boot script removes it again if
+      React never mounts. Content cannot get stuck invisible.
+
+   3. RESTRAINT. `opacity` and `translate` only — the two properties the
+      compositor can animate without touching layout. Nothing moves further
+      than 26px, nothing staggers past six items, and no element animates
+      twice: a container that holds reveal targets is never itself one.
+
+   Deliberately not here: parallax, scroll hijacking, counting numbers,
+   letter-by-letter text, pinned sections, animated blur. Each of those is a
+   recognisable tell that motion was added for its own sake.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   THE REVEAL TARGET LIST
+
+   This list is mirrored in `components/motion/RevealController.jsx`. Keep the
+   two in sync — the stylesheet decides what is hidden, the controller decides
+   what gets un-hidden, and a target in one but not the other either never
+   animates or never appears.
+
+   It is written at the level of a section's top-level children rather than
+   per block, so a new block on a new page animates without touching this file.
+   The controller drops any match that contains another match, so a grid
+   wrapper stays put while its cards cascade.
+
+   Hairline grids (`.rule-grid`, and the quick bar built on it) are deliberately
+   NOT split into their cells. Those components draw their rules by exposing a
+   1px background between cells that the cells then cover, so hiding the cells
+   individually leaves a grey plate on screen for a second — it reads as a
+   skeleton loader. They arrive as one piece instead.
+   -------------------------------------------------------------------------- */
+/* `@media screen` matters: a printed page has no scrolling and no observer
+   callbacks, so anything not currently revealed would come out of the printer
+   blank. Print gets the finished page, always. */
+@media screen {
+  html[data-motion="on"]
+    :where(
+      .section > .container > *,
+      .split > *,
+      .grid > *,
+      .b-intro__grid > *,
+      .b-cta__inner > *
+    ):not([data-revealed]) {
+    opacity: 0;
+    translate: 0 var(--motion-lift);
+  }
+}
+
+/* The transition lives on the REVEALED state, not on both. A transition is
+   read from the state being entered, so this animates hidden → revealed and
+   makes revealed → hidden instantaneous. That is what lets the reveal replay:
+   the controller re-hides an element only once it is completely off screen,
+   and re-hiding it must not be a visible 720ms fade of its own. */
+html[data-motion="on"]
+  :where(
+    .section > .container > *,
+    .split > *,
+    .grid > *,
+    .b-intro__grid > *,
+    .b-cta__inner > *
+  )[data-revealed] {
+  /* The delay is the element's index in its row of siblings, written by the
+     controller as `--reveal-i` and capped there. Six 90ms steps read as one
+     wave; a seventh starts to read as a queue. */
+  --reveal-delay: calc(var(--reveal-i, 0) * var(--motion-stagger));
+
+  transition:
+    opacity var(--motion-reveal) var(--ease-reveal) var(--reveal-delay),
+    translate var(--motion-reveal) var(--ease-reveal) var(--reveal-delay);
+}
+
+/* A revealed element carries no `translate` at all — not `translate: 0`, which
+   would leave a transform behind and quietly break `position: sticky` on the
+   sidebars and turn every revealed box into a containing block for the rest of
+   the session. Reaching the end of the transition is enough. */
+
+/* ==========================================================================
+   1. PAGE ENTRANCE — hero and page header
+
+   Time-based rather than observer-driven: this content is in the viewport at
+   load, so there is nothing to wait for. It runs on every page, immediately,
+   and is the site's first impression.
+   ========================================================================== */
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    translate: 0 var(--motion-lift);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes reveal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes reveal-media {
+  from {
+    opacity: 0;
+    scale: var(--motion-media-scale);
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .b-hero__copy > *,
+  .b-pagehero__inner > * {
+    animation: reveal-up var(--motion-enter) var(--ease-reveal) both;
+  }
+
+  /* Four steps of 110ms; a fifth and beyond share the last one so a long
+     hero never turns into a slow queue. */
+  .b-hero__copy > :nth-child(1),
+  .b-pagehero__inner > :nth-child(1) { animation-delay: calc(0 * var(--motion-enter-step)); }
+  .b-hero__copy > :nth-child(2),
+  .b-pagehero__inner > :nth-child(2) { animation-delay: calc(1 * var(--motion-enter-step)); }
+  .b-hero__copy > :nth-child(3),
+  .b-pagehero__inner > :nth-child(3) { animation-delay: calc(2 * var(--motion-enter-step)); }
+  .b-hero__copy > :nth-child(n + 4),
+  .b-pagehero__inner > :nth-child(n + 4) { animation-delay: calc(3 * var(--motion-enter-step)); }
+
+  /* The photograph settles rather than slides: a 4.5% scale over 1.2s, which
+     registers as depth and camera weight, not as a UI animation. */
+  .b-hero__media {
+    animation: reveal-media var(--motion-hero-media) var(--ease-reveal) both;
+  }
+}
+
+/* Reduced motion keeps the sequence but removes the movement — a cross-fade,
+   not a frozen page. */
+@media (prefers-reduced-motion: reduce) {
+  .b-hero__copy > *,
+  .b-pagehero__inner > *,
+  .b-hero__media {
+    animation: reveal-fade var(--dur-slow) linear both;
+  }
+}
+
+/* ==========================================================================
+   2. PAGE TRANSITIONS
+
+   React's <ViewTransition>, keyed on the pathname in
+   `components/motion/PageTransition.jsx`, hands the browser a snapshot of the
+   outgoing page and one of the incoming page. Everything below is the timing
+   of the cross-fade between them.
+
+   Asymmetric on purpose: the old page leaves quickly so it stops competing
+   for attention, and the new one arrives slowly enough to be read as arriving.
+   Unsupported browsers navigate normally, with no animation and no error.
+   ========================================================================== */
+
+@keyframes page-out {
+  to { opacity: 0; }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--motion-page-lift);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* Clicks during a transition would otherwise land on the overlay and be lost. */
+::view-transition {
+  pointer-events: none;
+}
+
+/* The site chrome — header, footer, page background — is everything outside
+   the named `page` element. It does not animate: swapping it instantly is
+   invisible, because it is identical on both pages, and it gives the reader a
+   fixed frame while the content changes inside it. */
+::view-transition-old(root) { display: none; }
+::view-transition-new(root) { animation: none; }
+
+/* The group would otherwise animate the old page's height into the new one's,
+   squashing both snapshots on the way. Pinning the group and letting each
+   snapshot keep its natural height is the standard fix. */
+::view-transition-group(page) {
+  animation: none;
+}
+
+::view-transition-old(page),
+::view-transition-new(page) {
+  block-size: auto;
+  inline-size: 100%;
+  object-fit: none;
+  object-position: top center;
+  /* Both snapshots occupy the same cell, so the outgoing one must not push
+     the page taller while it fades. */
+  overflow: clip;
+}
+
+::view-transition-old(page) {
+  animation: page-out var(--motion-page-out) var(--ease-in) both;
+}
+
+::view-transition-new(page) {
+  animation: page-in var(--motion-page-in) var(--ease-reveal) var(--motion-page-out) both;
+}
+
+/* Reduced motion: the swap still happens, it just happens at once. Positional
+   movement across the whole viewport is the single most common trigger for
+   motion sensitivity, so there is no softened variant here. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+/* ==========================================================================
+   3. HOVER
+   Interaction feedback, not decoration. `hover: hover` keeps it off touch
+   screens, where a hover state fires on tap and looks like a bug.
+   ========================================================================== */
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  /* A card's photograph creeps in by 2.5% while the card is under the
+     pointer. `.media` already clips, so nothing escapes the frame. */
+  .card .media img {
+    transition: scale var(--dur-move) var(--ease-out);
+  }
+
+  .card:has(.card__link:hover) .media img {
+    scale: 1.025;
+  }
+}

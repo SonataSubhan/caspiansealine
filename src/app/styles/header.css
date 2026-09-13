@@ -280,7 +280,7 @@
   background-color: var(--neutral-000);
   box-shadow: var(--shadow-lg);
   transform: translateX(100%);
-  transition: transform var(--dur-slow) var(--ease-out);
+  transition: transform var(--dur-move) var(--ease-out);
   overscroll-behavior: contain;
 }
 

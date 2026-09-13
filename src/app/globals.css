@@ -11,6 +11,7 @@
      components   → layer(components)  button, card, media, table, field …
      header/footer→ layer(components)  site chrome
      blocks       → layer(components)  page-level sections
+     motion       → layer(components)  every animation on the site, in one file
      utilities    → layer(utilities)   the small closed utility set
 
    Everything below `tokens` is layered, so a Tailwind utility can still win
@@ -31,6 +32,7 @@
 @import "./styles/header.css" layer(components);
 @import "./styles/footer.css" layer(components);
 @import "./styles/blocks.css" layer(components);
+@import "./styles/motion.css" layer(components);
 @import "./styles/utilities.css" layer(utilities);
 
 /* --------------------------------------------------------------------------

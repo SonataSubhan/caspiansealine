@@ -20,14 +20,17 @@ html {
   overflow-x: clip;
 }
 
+/* No blanket `animation-duration: 1ms !important` here on purpose.
+   Freezing the page is the retrofit fix; the current guidance is to replace
+   movement with a cross-fade, which motion.css does explicitly. Every
+   transition in this codebase reads a `--dur-*` token, and tokens.css collapses
+   those to 1ms under reduced motion — so transitions are covered without a
+   sledgehammer that would also kill the deliberate reduced-motion fades. */
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
+  html,
   *,
   *::before,
   *::after {
-    animation-duration: 1ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 1ms !important;
     scroll-behavior: auto !important;
   }
 }

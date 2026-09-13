@@ -167,14 +167,52 @@
 
   /* ---------------------------------------------------------------------
      8. MOTION
+     Easing is the ease-out family throughout: things arrive decelerating and
+     leave accelerating, which is how objects behave. `--ease-in` is reserved
+     for exits — used on an entrance it makes an interface feel sluggish.
+     Durations follow the published guidance that UI motion stays under 300ms;
+     only a reveal and a page-level move are allowed past it.
      --------------------------------------------------------------------- */
-  --ease-out:    cubic-bezier(0.22, 0.61, 0.36, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --ease-spring: cubic-bezier(0.34, 1.32, 0.64, 1);
-  --dur-instant: 90ms;
-  --dur-fast:    150ms;
-  --dur-base:    240ms;
-  --dur-slow:    420ms;
+  --ease-out:     cubic-bezier(0.165, 0.84, 0.44, 1);  /* quart — the default */
+  --ease-out-soft:cubic-bezier(0.2, 0, 0, 1);          /* UI state changes    */
+  --ease-in-out:  cubic-bezier(0.4, 0.14, 0.3, 1);     /* two-way movement    */
+  --ease-in:      cubic-bezier(0.3, 0, 1, 1);          /* exits only          */
+  --ease-spring:  cubic-bezier(0.34, 1.32, 0.64, 1);   /* used sparingly      */
+
+  /* Expo-out. Almost all of the distance is covered in the first third, then
+     it glides to a stop — which is what makes a long reveal read as calm
+     rather than slow. Reserved for reveals and page transitions; UI state
+     changes keep the shorter quart curve above. */
+  --ease-reveal:  cubic-bezier(0.16, 1, 0.30, 1);
+
+  --dur-instant: 100ms; /* hover, focus ring, press                */
+  --dur-fast:    150ms; /* exits, tooltips — exits beat entrances  */
+  --dur-base:    200ms; /* dropdowns, mega-menu panel              */
+  --dur-slow:    320ms; /* UI transitions — the ceiling for those  */
+  --dur-move:    400ms; /* drawer, image settle                    */
+
+  /* Reveal choreography.
+     These are content reveals, not UI transitions, so they sit deliberately
+     above the sub-300ms rule that governs the durations above: a reveal that
+     completes in 300ms is over before the eye reaches it. 720ms on an expo
+     curve is long enough to be felt and short enough that scrolling never
+     waits for it. */
+  /* Fade-up distance, fluid: 26px reads as deliberate on a desktop column and
+     as a lurch on a 390px screen, so it scales with the viewport like the type
+     and space scales do. One line instead of a media query. */
+  --motion-lift:        clamp(16px, 0.75rem + 1.2vw, 26px);
+  --motion-reveal:      720ms;  /* the section reveal                        */
+  --motion-stagger:     90ms;   /* between siblings in a row                 */
+  --motion-enter:       860ms;  /* hero / page header on load                */
+  --motion-enter-step:  110ms;  /* between hero lines                        */
+  --motion-hero-media: 1200ms;  /* ambient settle, not a UI transition       */
+  --motion-media-scale: 1.045;  /* the scale a photograph settles down from  */
+
+  /* Page transitions (View Transitions API). Exit is fast and enter is slow:
+     the outgoing page should be gone before the reader looks for the new one. */
+  --motion-page-out:    180ms;
+  --motion-page-in:     520ms;
+  --motion-page-lift:   14px;
 
   /* ---------------------------------------------------------------------
      9. Z-INDEX  — never write a raw z-index outside this list
