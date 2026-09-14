@@ -7,7 +7,6 @@ import SiteHeader from "@/components/navigation/SiteHeader";
 import SiteFooter from "@/components/navigation/SiteFooter";
 import PageTransition from "@/components/motion/PageTransition";
 import RevealController from "@/components/motion/RevealController";
-import { MOTION_BOOT_SCRIPT } from "@/components/motion/motionBootScript";
 import { JsonLd, organisationSchema, websiteSchema } from "@/lib/schema";
 import { getContent, localeAlternates, localeNames, locales } from "@/content";
 
@@ -75,7 +74,7 @@ export const viewport = {
 
 export default async function RootLayout({ children, params }) {
   const { locale } = await params;
-  const content = getContent(locale);
+  const { primaryNav, utilityNav, footerNav, legalNav, site, ui } = getContent(locale);
 
   return (
     /* `lang` is the reader's language, which is what a screen reader switches
@@ -84,24 +83,15 @@ export default async function RootLayout({ children, params }) {
        `data-scroll-behavior` restores instant scroll-to-top on navigation,
        which Next 16 no longer forces when the page sets scroll-behavior.
 
-       `suppressHydrationWarning` is required, and only here: the inline boot
-       script below writes `data-motion` onto this element before React
-       hydrates, so the server HTML and the client DOM legitimately differ by
-       that one attribute. The flag is shallow — it covers <html>'s own
-       attributes and nothing inside it. */
+       No `suppressHydrationWarning`, and no boot script: nothing writes to this
+       element before React hydrates any more. `data-motion` is set by
+       RevealController on mount, which is also what makes the server HTML and
+       the first client render identical. See app/styles/motion.css. */
     <html
       lang={localeNames[locale]?.htmlLang ?? "en"}
       className={mulish.variable}
       data-scroll-behavior="smooth"
-      suppressHydrationWarning
     >
-      <head>
-        {/* Runs before first paint. It is the only thing that switches the
-            reveal animations on, so if it never runs — no JavaScript, a
-            blocked bundle, an old engine — the page renders finished instead
-            of hidden. See components/motion/motionBootScript.js. */}
-        <script dangerouslySetInnerHTML={{ __html: MOTION_BOOT_SCRIPT }} />
-      </head>
       <body>
         <SkipLink locale={locale} />
         <IconSprite />
@@ -112,12 +102,18 @@ export default async function RootLayout({ children, params }) {
 
         <RevealController />
 
-        <SiteHeader locale={locale} content={content} />
+        {/* The header and footer get exactly the slices they render, not the
+            whole dictionary. The header is a Client Component, so everything
+            handed to it is serialised into the payload of every page —
+            passing the full dictionary would ship all sixteen services, every
+            article and every legal document to the browser on each request,
+            to render a navigation bar. */}
+        <SiteHeader locale={locale} content={{ primaryNav, utilityNav, site, ui }} />
 
         {/* Renders <main id="main"> and cross-fades it on every route change. */}
         <PageTransition>{children}</PageTransition>
 
-        <SiteFooter locale={locale} content={content} />
+        <SiteFooter locale={locale} content={{ footerNav, legalNav, site, ui }} />
       </body>
     </html>
   );

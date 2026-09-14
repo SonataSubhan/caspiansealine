@@ -10,8 +10,32 @@ import Grid from "@/components/layout/Grid";
 import { formatDate } from "@/content/lookup";
 import { localeHref } from "@/content";
 
-/** Article cards. Shared by the home page and /news. */
-export default function NewsGrid({ content, articles, locale, ui, headingId = "news-title", surface }) {
+/* The grid's column count, in one place: the layout below and the decision
+   about which cards are in the first row have to agree, and a number typed
+   twice is a number that will eventually disagree with itself. */
+const COLUMNS = 3;
+
+/**
+ * Article cards. Shared by the home page and /news.
+ *
+ * `leading` says this grid is the first content on the page, which makes its
+ * first row the Largest Contentful Paint candidate. The first card is then
+ * preloaded and the rest of its row is merely un-lazied; see Media for why
+ * those are two different things.
+ *
+ * On the home page the hero photograph already holds that role, so the flag is
+ * off and every card here stays lazy — a second preloaded image would compete
+ * with the hero for the same bandwidth and make the real LCP arrive later.
+ */
+export default function NewsGrid({
+  content,
+  articles,
+  locale,
+  ui,
+  headingId = "news-title",
+  surface,
+  leading = false,
+}) {
   return (
     <Section surface={surface} aria-labelledby={headingId}>
       <SectionHead
@@ -28,10 +52,19 @@ export default function NewsGrid({ content, articles, locale, ui, headingId = "n
         }
       />
 
-      <Grid cols={3}>
-        {articles.map((article) => (
+      <Grid cols={COLUMNS}>
+        {articles.map((article, index) => (
           <Card className="news-card" key={article.slug}>
-            <Media locale={locale} slot={`news-${article.slug}`} width={960} height={540} flush sizes="(max-width: 599px) 100vw, 33vw" />
+            <Media
+              locale={locale}
+              slot={`news-${article.slug}`}
+              width={960}
+              height={540}
+              flush
+              preload={leading && index === 0}
+              eager={leading && index < COLUMNS}
+              sizes="(max-width: 599px) 100vw, 33vw"
+            />
             <CardBody>
               <p className="news-card__meta">
                 <time dateTime={article.date}>{formatDate(article.date, locale)}</time>

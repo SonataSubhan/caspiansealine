@@ -23,7 +23,6 @@ export async function generateMetadata({ params }) {
   const { additionalPorts, corridors, home, lanes, networkPage, ports, ui } = getContent(locale);
 
   return buildMetadata({
-   locale,
     locale,
     title: networkPage.meta.title,
     description: networkPage.meta.description,

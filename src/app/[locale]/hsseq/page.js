@@ -19,7 +19,6 @@ export async function generateMetadata({ params }) {
   const { home, hsseq, ui } = getContent(locale);
 
   return buildMetadata({
-   locale,
     locale,
     title: hsseq.meta.title,
     description: hsseq.meta.description,

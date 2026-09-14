@@ -17,7 +17,6 @@ export async function generateMetadata({ params }) {
   const { contactPage, site, ui } = getContent(locale);
 
   return buildMetadata({
-   locale,
     locale,
     title: contactPage.meta.title,
     description: contactPage.meta.description,

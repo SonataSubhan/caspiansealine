@@ -37,6 +37,7 @@ export default function Media({
   flush = false,
   sizes = "(max-width: 899px) 100vw, 50vw",
   preload = false,
+  eager = false,
   className = "",
 }) {
   const classes = ["media", ratio ? RATIOS[ratio] : "", flush ? "media--flush" : "", className]
@@ -57,9 +58,19 @@ export default function Media({
           alt={resolvedAlt}
           fill
           sizes={sizes}
-          /* `preload` replaced `priority` in Next 16. Reserved for the one
-             image that is the LCP element; everything else lazy-loads. */
+          /* `preload` replaced `priority` in Next 16. It emits a <link
+             rel="preload"> in the document head, so it is reserved for the one
+             image that is the LCP element — a second preloaded image competes
+             with the first for the same bandwidth and delays it.
+
+             `eager` is the weaker sibling: it only cancels lazy loading, with
+             no preload link and no priority claim. It is for an image that sits
+             above the fold beside the LCP one — a card next to it in the same
+             row — where waiting for layout before the request starts is pure
+             delay, but jumping the queue would be a lie about its importance.
+             Everything else lazy-loads. */
           preload={preload}
+          loading={!preload && eager ? "eager" : undefined}
           quality={75}
         />
       </div>

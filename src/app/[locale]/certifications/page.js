@@ -16,7 +16,6 @@ export async function generateMetadata({ params }) {
   const { certifications, home, ui } = getContent(locale);
 
   return buildMetadata({
-   locale,
     locale,
     title: certifications.meta.title,
     description: certifications.meta.description,

@@ -48,6 +48,18 @@ const securityHeaders = [
 const nextConfig = {
   reactCompiler: true,
 
+  experimental: {
+    /**
+     * A branded 404 for addresses that match no route at all.
+     *
+     * `[locale]/not-found.js` only fires when a matched route calls
+     * `notFound()`. A URL like `/nope` never enters a segment, so without this
+     * flag Next serves its own unstyled "404 | This page could not be found" —
+     * the one page on the site that would look like it belonged to nobody.
+     */
+    globalNotFound: true,
+  },
+
   // Trailing slashes off keeps one canonical URL per page.
   trailingSlash: false,
 

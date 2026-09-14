@@ -23,6 +23,16 @@ import { usePathname } from "next/navigation";
  * The animation itself is entirely in `app/styles/motion.css` — this file
  * decides *when*, never *how*. Nothing here reads a duration or a distance.
  *
+ * WHAT `data-motion` IS FOR. The stylesheet hides reveal targets on its own,
+ * from first paint, and repairs itself after two seconds if nothing ever
+ * un-hides them. This component's first act is to write `data-motion` onto
+ * <html>, which cancels that repair and hands the timing over to the observers
+ * below. It is therefore not the thing that hides content — it is the thing
+ * that says "something is here to show it again". There is no boot script and
+ * no `<script>` element anywhere in the tree: React 19 warns about any script a
+ * component renders, and the guarantee is stronger in CSS anyway, because CSS
+ * cannot fail to load and leave the page hidden.
+ *
  * Why not CSS scroll-driven animations (`animation-timeline: view()`)? They
  * need no JavaScript, but they scrub: progress is bound to scroll position
  * rather than to time, `animation-duration` is ignored, and the reveal is over
@@ -60,14 +70,23 @@ export default function RevealController() {
   useLayoutEffect(() => {
     const root = document.documentElement;
 
-    /* The inline boot script hid the targets before first paint and armed a
-       failsafe against React never mounting. Disarm it. */
-    root.dataset.motionReady = "1";
+    /* The one thing the stylesheet cannot check for itself. Writing "off"
+       rather than returning early matters: the attribute is what cancels the
+       failsafe, so an engine without IntersectionObserver gets the finished
+       page now instead of two seconds from now. */
+    if (typeof IntersectionObserver === "undefined") {
+      root.dataset.motion = "off";
+      return undefined;
+    }
 
-    /* No `data-motion` means the boot script decided motion is off — reduced
-       motion, no IntersectionObserver, or it never ran. Nothing is hidden, so
-       there is nothing to reveal. */
-    if (root.dataset.motion !== "on") return undefined;
+    /* Reduced motion is handled by the stylesheet's own media query — nothing
+       was ever hidden — so this only settles the attribute. */
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      root.dataset.motion = "off";
+      return undefined;
+    }
+
+    root.dataset.motion = "on";
 
     const arrive = new IntersectionObserver(
       (entries) => {
@@ -96,7 +115,12 @@ export default function RevealController() {
     /* On a route change the incoming page is already being cross-faded by the
        view transition; making its visible half fade in a second time on top of
        that reads as a stutter. So after the first load, anything on screen at
-       arrival is simply shown. Below the fold still reveals on scroll. */
+       arrival is simply shown. Below the fold still reveals on scroll.
+
+       On the first load there is no cross-fade to collide with, and nothing has
+       been painted yet — the stylesheet hid these before first paint — so the
+       whole first screen animates in. That is the site's first impression, and
+       it is the reason the hiding belongs in CSS rather than here. */
     const revealOnSight = !firstRun.current;
     firstRun.current = false;
 

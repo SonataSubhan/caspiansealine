@@ -55,8 +55,18 @@ function prefixHrefs(value, prefix) {
   return value;
 }
 
+/**
+ * Both dictionaries are PLAIN objects, never the module namespaces themselves.
+ *
+ * `import * as en` gives a Module object, and React refuses to serialise one
+ * across the server/client boundary — "Only plain objects can be passed to
+ * Client Components". The header is a Client Component, so the spread is not
+ * cosmetic: without it the whole site renders a 500 in English and works in
+ * Azerbaijani, because the Azerbaijani dictionary was already being rebuilt by
+ * `prefixHrefs`.
+ */
 const dictionaries = {
-  en,
+  en: { ...en },
   az: prefixHrefs({ ...az }, "/az"),
 };
 

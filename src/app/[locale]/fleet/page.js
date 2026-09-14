@@ -21,7 +21,6 @@ export async function generateMetadata({ params }) {
   const { fleetPage, home, ui, vessels } = getContent(locale);
 
   return buildMetadata({
-   locale,
     locale,
     title: fleetPage.meta.title,
     description: fleetPage.meta.description,

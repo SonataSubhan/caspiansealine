@@ -20,7 +20,6 @@ export async function generateMetadata({ params }) {
   const { additionalPorts, articles, home, lanes, ports, servicePillars, site, sustainability, ui, vessels } = getContent(locale);
 
   return buildMetadata({
-   locale,
     locale,
     title: `${site.name} — ${home.meta.title}`,
     description: home.meta.description,

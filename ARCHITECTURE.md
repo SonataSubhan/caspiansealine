@@ -59,7 +59,7 @@ src/
 │   │                        Stack, Cluster, Prose
 │   ├── navigation/          SiteHeader, MobileDrawer, SiteFooter, Breadcrumb, SkipLink,
 │   │                        LanguageSwitcher
-│   ├── motion/              RevealController, PageTransition, motionBootScript
+│   ├── motion/              RevealController, PageTransition
 │   └── blocks/              Page sections: Hero, QuickBar, Intro, ServicePillars,
 │                            NetworkPreview, LaneTable, FleetGrid, Capabilities,
 │                            SustainabilityBand, NewsGrid, CtaBand, PageHero, EnquiryForm
@@ -94,7 +94,7 @@ src/
 | Publish a news article | one entry in `news.js` |
 | Change the brand colour, type scale, spacing or radius | `src/app/styles/tokens.css` |
 | Make the animations faster, slower, longer or shorter | the `--motion-*` tokens in `src/app/styles/tokens.css` |
-| Turn all motion off | delete the three files listed in §8 |
+| Turn all motion off | delete the files listed in §8 |
 | Make the whole site denser or airier | `--section-y` in `src/app/styles/tokens.css` |
 | Add a nav item | `navigation.js` in both languages — header, drawer and footer all update |
 | Change the site-wide title pattern | `title.template` in `app/[locale]/layout.js` |
@@ -140,7 +140,16 @@ src/content/
 └── az/               the Azerbaijani dictionary, same export names
 ```
 
-Five rules hold it together:
+Six rules hold it together:
+
+**0. A dictionary is a plain object.** `content/index.js` spreads each module
+namespace (`{ ...en }`) before handing it out. `import * as en` produces a Module object,
+and React refuses to serialise one into a Client Component — the header is a Client
+Component, so without the spread every English page 500s while Azerbaijani works, because
+the Azerbaijani dictionary was already being rebuilt by the href prefixer. The header and
+footer are also given only the slices they render, not the whole dictionary: anything
+handed to a Client Component is serialised into the payload of every page, and a
+navigation bar does not need sixteen service descriptions.
 
 **1. Both dictionaries export the same names.** A page asks for `home` and gets the
 reader's `home`; it never learns that two exist. `src/content/en/index.js` and
@@ -172,10 +181,22 @@ each one into a visible bug.
 | The language segment | `src/app/[locale]/` — every route, with `generateStaticParams` for both |
 | The switcher | `src/components/navigation/LanguageSwitcher.jsx` |
 | Dates | `formatDate(iso, locale)` in `content/lookup.js` — `az-Latn-AZ` / `en-GB` |
-| 404 | reads the locale from `next/root-params`, since a not-found page gets no `params` |
+| 404 (unmatched URL) | `app/global-not-found.js` + `experimental.globalNotFound` |
+| 404 (bad slug in a real route) | `app/[locale]/not-found.js` |
 
 The proxy rewrite does **not** make anything dynamic: the build still prerenders every
 route in both languages (155 static outputs).
+
+Both 404 pages are **bilingual on purpose**. A not-found page receives no `params` — there
+is no segment to read — so rather than guess a language it says the same thing twice, each
+half tagged with its own `lang` so a screen reader pronounces both correctly. The two files
+exist because Next splits the case in two: `not-found.js` fires when a matched route calls
+`notFound()` (a bad service slug), while an address like `/nope` never enters a segment at
+all and needs `global-not-found.js`, which bypasses the layout and therefore declares its
+own `<html>`, font and stylesheet.
+
+> `next/root-params` looks like the way to give a 404 its locale and is not: it exports
+> nothing in this build, and the import fails at compile time. Do not reach for it again.
 
 **Adding Russian** is a folder, a barrel with the same export names, and one entry in
 `locales`. No component and no page changes.
@@ -276,8 +297,9 @@ Three files, and nothing else on the site knows they exist:
 | `src/app/styles/motion.css` | every duration, distance and curve — *how* things move |
 | `src/components/motion/RevealController.jsx` | two IntersectionObservers — *when* a reveal fires |
 | `src/components/motion/PageTransition.jsx` | `<ViewTransition>` around `<main>` — the route cross-fade |
+| `public/motion-boot.js` | the pre-paint switch that makes hiding safe |
 
-Delete all three and the site is identical, just static.
+Delete all four and the site is identical, just static.
 
 **Timed, not scrubbed.** The first version used CSS scroll-driven animations
 (`animation-timeline: view()`). They are elegant and need no JavaScript, but
@@ -299,7 +321,7 @@ is revealed once and then left alone entirely.
 
 **The fallback is the finished state.** Nothing is hidden unless
 `html[data-motion="on"]` is present, and only the inline boot script
-(`motionBootScript.js`, run before first paint) sets it — and only when
+(`public/motion-boot.js`, run before first paint) sets it — and only when
 `IntersectionObserver` exists and the reader has not asked for reduced motion.
 No JavaScript, a blocked bundle, an old engine, a crawler: the attribute is
 absent and the page renders finished. A 2.5s failsafe in that script removes it

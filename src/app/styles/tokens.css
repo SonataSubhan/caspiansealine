@@ -207,6 +207,11 @@
   --motion-enter-step:  110ms;  /* between hero lines                        */
   --motion-hero-media: 1200ms;  /* ambient settle, not a UI transition       */
   --motion-media-scale: 1.045;  /* the scale a photograph settles down from  */
+  /* How long a hidden section waits for JavaScript before showing itself
+     anyway. Long enough that a slow connection is not mistaken for a broken
+     one, short enough that a genuinely broken bundle costs the reader two
+     seconds rather than the page. See the failsafe in motion.css. */
+  --motion-failsafe:   2000ms;
 
   /* Page transitions (View Transitions API). Exit is fast and enter is slow:
      the outgoing page should be gone before the reader looks for the new one. */

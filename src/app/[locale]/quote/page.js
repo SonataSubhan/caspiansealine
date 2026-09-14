@@ -16,7 +16,6 @@ export async function generateMetadata({ params }) {
   const { quotePage, services, site, ui } = getContent(locale);
 
   return buildMetadata({
-   locale,
     locale,
     title: quotePage.meta.title,
     description: quotePage.meta.description,

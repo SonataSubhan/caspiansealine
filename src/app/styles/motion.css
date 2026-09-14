@@ -18,13 +18,24 @@
       A timed transition can be given a real speed, plays once, and works in
       Firefox, which skipped the scroll-driven version entirely.
 
-   2. THE FALLBACK IS THE FINISHED STATE. Nothing is hidden unless
-      `html[data-motion="on"]` is present, and only the inline boot script
-      sets it — before first paint, and only when IntersectionObserver exists
-      and the reader has not asked for reduced motion. No JavaScript, a failed
-      bundle, an old engine, a crawler: the attribute is absent and the page
-      renders finished. A 2.5s failsafe in the boot script removes it again if
-      React never mounts. Content cannot get stuck invisible.
+   2. THE FALLBACK IS THE FINISHED STATE. Content can only ever be hidden
+      where it is certain something can show it again. That is enforced three
+      deep, and all three are in this file — no boot script, no inline
+      `<script>`, nothing outside React's tree to keep in sync with it:
+
+        - `@media (scripting: enabled)` — a reader with JavaScript off, and
+          every crawler that does not run it, never matches the hiding rule at
+          all. A browser too old to understand the query drops the block and
+          gets the same finished page.
+        - `@media (prefers-reduced-motion: no-preference)` — likewise for a
+          reader who has asked for stillness.
+        - the failsafe below — JavaScript is enabled but the bundle never
+          arrives, so nothing can un-hide anything. The hidden state is itself
+          a 2s animation that ends visible, so the page repairs itself.
+
+      This is why the hiding rule is the pre-JavaScript state rather than
+      something JavaScript switches on: hidden-until-proven-otherwise is only
+      safe when "otherwise" needs no JavaScript to prove.
 
    3. RESTRAINT. `opacity` and `translate` only — the two properties the
       compositor can animate without touching layout. Nothing moves further
@@ -55,10 +66,48 @@
    individually leaves a grey plate on screen for a second — it reads as a
    skeleton loader. They arrive as one piece instead.
    -------------------------------------------------------------------------- */
-/* `@media screen` matters: a printed page has no scrolling and no observer
-   callbacks, so anything not currently revealed would come out of the printer
-   blank. Print gets the finished page, always. */
-@media screen {
+/* The failsafe: the hidden state, expressed as an animation that ends visible.
+   `step-end` holds the `from` frame for the full duration and then snaps to
+   `to`, so this is indistinguishable from `opacity: 0` for two seconds and
+   then, if nothing has intervened, simply shows the content.
+
+   Nothing intervening is the point. The controller writes `data-motion` the
+   moment it mounts, this rule stops matching, and the plain hidden rule below
+   takes over — same two values, so the swap is invisible. If the controller
+   never mounts, the reader still gets the page. */
+@keyframes motion-failsafe {
+  from {
+    opacity: 0;
+    translate: 0 var(--motion-lift);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* `screen` matters: a printed page has no scrolling and no observer callbacks,
+   so anything not currently revealed would come out of the printer blank.
+   Print gets the finished page, always.
+
+   `scripting` and `prefers-reduced-motion` are the two guarantees described at
+   the top of this file. They gate the hiding, not the animating, which is why
+   they sit on the block rather than on individual rules. */
+@media screen and (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  /* Before the controller has said anything — which includes the whole of
+     first paint, so no reveal target is ever painted and then taken away. */
+  html:not([data-motion])
+    :where(
+      .section > .container > *,
+      .split > *,
+      .grid > *,
+      .b-intro__grid > *,
+      .b-cta__inner > *
+    ) {
+    animation: motion-failsafe var(--motion-failsafe) step-end both;
+  }
+
+  /* …and after it, for as long as an element has not arrived. */
   html[data-motion="on"]
     :where(
       .section > .container > *,

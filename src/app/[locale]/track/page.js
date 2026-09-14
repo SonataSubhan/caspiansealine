@@ -15,7 +15,6 @@ export async function generateMetadata({ params }) {
   const { site, trackPage, ui } = getContent(locale);
 
   return buildMetadata({
-   locale,
     locale,
     title: trackPage.meta.title,
     description: trackPage.meta.description,

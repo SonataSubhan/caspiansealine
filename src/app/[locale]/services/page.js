@@ -22,7 +22,6 @@ export async function generateMetadata({ params }) {
   const { home, serviceCategories, services, servicesPage, ui } = getContent(locale);
 
   return buildMetadata({
-   locale,
     locale,
     title: servicesPage.meta.title,
     description: servicesPage.meta.description,

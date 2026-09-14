@@ -16,7 +16,6 @@ export async function generateMetadata({ params }) {
   const { articles, home, newsPage, ui } = getContent(locale);
 
   return buildMetadata({
-   locale,
     locale,
     title: newsPage.meta.title,
     description: newsPage.meta.description,
@@ -48,6 +47,7 @@ export default async function NewsIndexPage({ params }) {
         articles={latest}
         locale={locale}
         ui={ui}
+        leading
       />
 
       <Section spacing="tight">

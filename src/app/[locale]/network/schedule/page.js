@@ -17,7 +17,6 @@ export async function generateMetadata({ params }) {
   const { home, lanes, networkPage, schedulePage, ui } = getContent(locale);
 
   return buildMetadata({
-   locale,
     locale,
     title: schedulePage.meta.title,
     description: schedulePage.meta.description,

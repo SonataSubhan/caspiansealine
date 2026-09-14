@@ -539,3 +539,21 @@
 @media (max-width: 599px) {
   .form-grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* --------------------------------------------------------------------------
+   404
+
+   The only bilingual page on the site: it renders for an address that matched
+   no route, so there is no locale segment to read and no honest way to pick a
+   language. The second block is separated by a hairline rather than by a gap,
+   so the two languages read as one page rather than two stacked pages.
+   -------------------------------------------------------------------------- */
+.not-found__block + .not-found__block {
+  margin-block-start: var(--space-xl);
+  padding-block-start: var(--space-xl);
+  border-block-start: var(--border-w) solid var(--border-inverse);
+}
+
+.not-found__block > * + * {
+  margin-block-start: var(--space-md);
+}
